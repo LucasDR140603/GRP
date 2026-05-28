@@ -1,0 +1,13 @@
+import {FaEye,FaEyeSlash} from 'react-icons/fa'
+import { useState,useRef,useEffect } from 'react'
+import { numeros } from '../Funciones'
+export default function({value=null,onChange=(val)=>{},className="",style={},type="text",placeholder="",error=false,maxLength=null,ref=useRef()}){
+    const [mostrar,setMostrar]=useState(false)
+    const tipo=type.toLowerCase()
+    const clave=tipo=="password"
+    const tel=tipo=="tel"
+    return <div style={{position:'relative',...style}}>
+        {clave?<div className={className+(error?" red":"")} style={{position:'absolute',top:'50%',transform:'translateY(-50%)',right:'0.5rem',cursor:'pointer',color:error?'red':'#8e8a4c'}} onClick={()=>{setMostrar(!mostrar)}}>{mostrar?<FaEyeSlash className={className}/>:<FaEye className={className}/>}</div>:null}
+        <input ref={ref} style={{height:'100%',width:'100%'}} className={className+(error?" red":"")} type={(clave && mostrar)?"text":tipo} value={value} onChange={(e)=>{let texto=e.target.value;if(tel){texto=numeros(texto)};onChange(texto)}} maxLength={tel?9:maxLength} placeholder={placeholder}/>
+    </div>
+}

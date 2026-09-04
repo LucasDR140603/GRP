@@ -1,25 +1,24 @@
-import { useData } from "../DataContext"
-import Perfil from "./Perfil"
-import api from "../Api"
-import Close from "./Close"
-import Checkbox from "./Checkbox"
+import { useData } from "../DataContext.tsx"
+import Perfil from "./Perfil.tsx"
+import api from "../Api.tsx"
+import Close from "./Close.tsx"
+import Checkbox from "./Checkbox.tsx"
 import { useEffect,useState,useRef } from "react"
-import Filtro from "./Filtro"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2"
-import { sin_acentos } from "../Funciones"
+import { sin_acentos } from "../Funciones.tsx"
 export default function(){
     const {usuarios,usuario}=useData()
     const columnas=["Perfil","Nick","Nombre","1º Apellido","2º Apellido","Email","Teléfono","Administrador","Operativo"]
-    const [orden,setOrden]=useState(null)
-    const [sentido,setSentido]=useState(null)
+    const [orden,setOrden]=useState<string | null>(null)
+    const [sentido,setSentido]=useState<number | null>(null)
     const [abiertos,setAbiertos]=useState(true)
     const [cerrados,setCerrados]=useState(true)
     const [busqueda,setBusqueda]=useState("")
-    const [seleccion,setSeleccion]=useState(null)
+    const [seleccion,setSeleccion]=useState<Record<string,any> | null>(null)
     const [accion,setAccion]=useState("")
     const acciones=["hacer administrador","Dar de ","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef(null)
+    const ventana=useRef<any>(null)
     useEffect(()=>{
         setAccion("")
         setConfirmacion(false)
@@ -30,18 +29,18 @@ export default function(){
             ventana.current.close()
         }
     },[seleccion])
-    const mostrables=usuarios.filter((x)=>{
+    const mostrables:any[]=usuarios.filter((x:any)=>{
         let sin_perfil={...x}
         delete sin_perfil.perfil
-        return Object.values(sin_perfil).map((y)=>y==true?"sí":y==false?"no":y).find((y)=>sin_acentos(y.toLowerCase()).includes(sin_acentos(busqueda.toLowerCase())))!=null &&  ((!x.operativo && cerrados) || (x.operativo && abiertos))
+        return Object.values(sin_perfil).map((y)=>y==true?"sí":y==false?"no":`${y}`).find((y)=>sin_acentos(y.toLowerCase()).includes(sin_acentos(busqueda.toLowerCase())))!=null &&  ((!x.operativo && cerrados) || (x.operativo && abiertos))
     })
     const ordenados=()=>{
         let lista=mostrables
         if (orden!=null && sentido!=null){
             lista.sort((x,y)=>{
                     let campo=orden
-                    function format(o){
-                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden)
+                    function format(o:any){
+                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden!)
                         let valor=o[indice_columna==columnas.length-1?'operativo':campo]
                         if (typeof(valor)==typeof("texto")){
                             valor=valor.toLowerCase()
@@ -61,14 +60,14 @@ export default function(){
             if (accion!=acciones[2]){
                 let campo=accion==acciones[0]?"administrador":"operativo"
                 let nuevo={...seleccion,
-                    [campo]:!seleccion[campo]
+                    [campo]:!seleccion![campo]
                 }
                 api.put(`usuarios`,nuevo).then((res)=>{
                     setSeleccion(null)
                 })
             }
             else if (confirmacion){
-                api.delete(`usuarios/${seleccion.id}`).then((res)=>{
+                api.delete(`usuarios/${seleccion!.id}`).then((res)=>{
                     setSeleccion(null)
                 })
             }
@@ -80,7 +79,7 @@ export default function(){
         }
     })
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter" && accion==acciones[2]){
                 setConfirmacion(true)
             }
@@ -128,11 +127,11 @@ export default function(){
                         <tr>{columnas.map((x,i)=>{
                             let v=sin_acentos(x.toLowerCase())
                             if (v.includes("apellido")){
-                                v=v.split(' ').toReversed().reduce((x,y)=>x+y).slice(0,-1)
+                                v=v.split(' ').toReversed().reduce((x:string,y:string)=>x+y).slice(0,-1)
                             }
                             return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
                                 return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido(sentido*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
+                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido!=null?sentido:1)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
                         })}</tr>
                         <tr>
                             {columnas.map((x)=><th>{x}</th>)}

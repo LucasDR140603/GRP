@@ -1,25 +1,23 @@
-import { useData } from "../DataContext"
-import api from "../Api"
-import Close from "./Close"
-import Checkbox from "./Checkbox"
+import { useData } from "../DataContext.tsx"
+import api from "../Api.tsx"
+import Close from "./Close.tsx"
+import Checkbox from "./Checkbox.tsx"
 import { useEffect,useState,useRef } from "react"
-import Filtro from "./Filtro"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2"
-import { sin_acentos } from "../Funciones"
-import AddEditCentro from "./AddEditCentro"
+import { sin_acentos } from "../Funciones.tsx"
+import AddEditCliente from "./AddEditCliente.tsx"
 export default function(){
-    const [open,setOpen]=useState(-1)
-    const {clientes,centros,getClienteByCentro,usuario}=useData()
-    const [orden,setOrden]=useState(null)
-    const [sentido,setSentido]=useState(null)
+    const {clientes,usuario}=useData()
+    const [orden,setOrden]=useState<string | null>(null)
+    const [sentido,setSentido]=useState<number | null>(null)
     const [abiertos,setAbiertos]=useState(true)
     const [cerrados,setCerrados]=useState(true)
     const [busqueda,setBusqueda]=useState("")
-    const [seleccion,setSeleccion]=useState(null)
+    const [seleccion,setSeleccion]=useState<any>(null)
     const [accion,setAccion]=useState("")
     const acciones=["Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef(null)
+    const ventana=useRef<any>(null)
     useEffect(()=>{
         setAccion("")
         setConfirmacion(false)
@@ -30,26 +28,18 @@ export default function(){
             ventana.current.close()
         }
     },[seleccion])
-    const [cli,setCli]=useState(clientes.map((x)=>{
-        return {
-            "id":x.id,
-            "label":x.nombre,
-            "checked":true,
-            "visible":true,
-        }
-    }))
-    const mostrables=centros.filter((x)=>{
-        return Object.values(x).concat([getClienteByCentro.current(x).nombre]).map((y)=>y==true?"abierto":y==false?"cerrado":y).find((y)=>sin_acentos(y.toLowerCase()).includes(sin_acentos(busqueda.toLowerCase())))!=null &&  ((!x.abierto && cerrados) || (x.abierto && abiertos)) && cli.find((y)=>y.id==x.id_cliente && y.checked)!=null
+    const mostrables:any[]=clientes.filter((x:any)=>{
+        return Object.values(x).map((y)=>y==true?"abierto":y==false?"cerrado":`${y}`).find((y)=>y.toLowerCase().includes(busqueda.toLowerCase()))!=null &&  ((!x.abierto && cerrados) || (x.abierto && abiertos))
     })
-    const columnas=['Cliente','Nombre','Estado']
+    const columnas=['Nombre','Estado']
     const ordenados=()=>{
-        let lista=mostrables
+        let lista:any[]=mostrables
         if (orden!=null && sentido!=null){
             lista.sort((x,y)=>{
                     let campo=orden
-                    function format(o){
-                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden)
-                        let valor=indice_columna==0?getClienteByCentro.current(o).nombre:o[indice_columna==columnas.length-1?'abierto':campo]
+                    function format(o:any){
+                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden!)
+                        let valor=o[indice_columna==columnas.length-1?'abierto':campo]
                         if (typeof(valor)==typeof("texto")){
                             valor=valor.toLowerCase()
                         }
@@ -65,7 +55,7 @@ export default function(){
     }
     useEffect(()=>{
         if (accion==acciones[1] && confirmacion){
-            api.delete(`centros/${seleccion.id}`).then((res)=>{
+            api.delete(`clientes/${seleccion.id}`).then((res)=>{
                 setSeleccion(null)
             })
         }
@@ -76,7 +66,7 @@ export default function(){
         }
     })
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter" && accion==acciones[1]){
                 setConfirmacion(true)
             }
@@ -93,7 +83,7 @@ export default function(){
         return seleccion!=null?
             <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                 {seleccion.id==null || accion==acciones[0]?
-                <AddEditCentro x={seleccion.id==null?seleccion:centros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
+                <AddEditCliente x={seleccion.id==null?seleccion:clientes.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
                 :
                 <>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
                 }
@@ -106,24 +96,22 @@ export default function(){
         <div className="ventana-emergente">
             <Close onClick={()=>{setAccion("")}} absolute={true}/>
             <h1 style={{marginBlock:0}}>ALERTA</h1>
-            <p>Va a eliminar un centro y con él sus proyectos y registros. Acción irreversible</p>
+            <p>Va a eliminar un cliente y con él sus centros, proyectos y registros. Acción irreversible</p>
             <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
         </div>
         :null
     }
     return (
         <div className="component">
-            {usuario.administrador?
-            <div className="btnbox">
+            {usuario.administrador?<div className="btnbox">
                 <a className="btn" onClick={()=>{
                     setSeleccion(seleccion==null?()=>{
-                        let ultimo={nombre:"",id_cliente:centros[0].id_cliente,abierto:true}
+                        let ultimo={nombre:"",abierto:true}
                         return ultimo
                     }:null)
                 }}>Añadir</a>
-            </div>
-            :null}
-            <h1>CENTROS</h1>
+            </div>:null}
+            <h1>CLIENTES</h1>
             <div className="options">
                 <div><Checkbox val={abiertos} setVal={setAbiertos} title={"Abiertos"}/><Checkbox val={cerrados} setVal={setCerrados} title={"Cerrados"}/></div>
                 <input type="text" placeholder="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}} style={{borderColor:'gold'}}/>
@@ -134,24 +122,20 @@ export default function(){
                     <thead>
                         <tr>{columnas.map((x,i)=>{
                             let v=sin_acentos(x.toLowerCase())
-                            return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
+                            return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden((prev)=>{
                                 return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido(sentido*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
+                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido==null?1:sentido)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
                         })}</tr>
                         <tr>{columnas.map((x,i)=>{
-                            let nc=i==0 && cli!=null && cli.length>0 && cli.filter((y)=>!y.checked && y.visible).length>0
-                            return <th className={nc?"bg-aqua":""} onClick={()=>{setOpen(open==i || i>0?-1:i)}}>
+                            return <th>
                                 {x}
-                                {open==i?
-                                    <Filtro lista={cli} set={setCli}/>
-                                :null}
                                 </th>
                             })}
                         </tr>
                     </thead>
                     <tbody>
                         {ordenados().map((x)=>{
-                            return <tr className={x.id==seleccion?.id?'selected':!x.abierto?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><td>{getClienteByCentro.current(x).nombre}</td><td>{x.nombre}</td><td>{x.abierto?"Abierto":"Cerrado"}</td></tr>
+                            return <tr className={x.id==seleccion?.id?'selected':!x.abierto?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><td>{x.nombre}</td><td>{x.abierto?"Abierto":"Cerrado"}</td></tr>
                         })}
                     </tbody>
                     <tfoot>
@@ -164,15 +148,14 @@ export default function(){
                     seleccion!=null?
                     <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                         {seleccion.id==null || accion==acciones[0]?
-                        <AddEditCentro x={seleccion.id==null?seleccion:centros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
+                        <AddEditCliente x={seleccion.id==null?seleccion:clientes.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
                         :accion==acciones[1]?
                         <div>
                             <h1 style={{marginBlock:0}}>ALERTA</h1>
-                            <p>Va a eliminar un centro y con él sus proyectos y registros. Acción irreversible</p>
+                            <p>Va a eliminar un cliente y con él sus centros, proyectos y registros. Acción irreversible</p>
                             <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
                         </div>
-                        :
-                        <>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
+                        :<>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
                         }
                         <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [0,1].includes(acciones.indexOf(accion))}/>
                     </div>

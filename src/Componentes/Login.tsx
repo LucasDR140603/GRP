@@ -1,12 +1,12 @@
-import Password from "./Password";
+import Password from "./Password.tsx";
 import { useState,useEffect, useRef } from "react";
-import { useData } from "../DataContext";
-import Input from "./Input";
+import { useData } from "../DataContext.tsx";
+import Input from "./Input.tsx";
 import Cookies from 'js-cookie'
-import Close from "./Close.jsx";
+import Close from "./Close.tsx";
 import { ThreeDots } from "react-loader-spinner";
-import api from "../Api.jsx";
-import { comprobar } from "../Funciones";
+import api from "../Api.tsx";
+import { comprobar } from "../Funciones.tsx";
 import {useTimer} from 'react-timer-hook'
 import Turnstile from "react-turnstile";
 export default function(){
@@ -23,8 +23,8 @@ export default function(){
     const [codigo,setCodigo]=useState("")
     const [codigo_correcto,setCodigoCorrecto]=useState(false)
     const [cargando,setCargando]=useState(false)
-    const inputRefs=useRef([])
-    const ventana=useRef(null)
+    const inputRefs=useRef<any>([])
+    const ventana=useRef<any>(null)
     const tiempo=()=>{
         const t=new Date();
         t.setSeconds(t.getSeconds()+900);
@@ -38,15 +38,15 @@ export default function(){
         },
         expiryTimestamp:tiempo()
     })
-    const loguear=()=>init({user:user,clave:clave}).then((res)=>{
+    const loguear=()=>init({user:user,clave:clave}).then((res:any)=>{
         if (Cookies.get('token')==null){
             setError(true)
         }
     })
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (['ArrowDown','ArrowUp'].includes(e.key)){
-                inputRefs.current.find((x)=>x!=document.activeElement).focus()
+                inputRefs.current.find((x:any)=>x!=document.activeElement).focus()
             }
         }
         window.addEventListener('keydown',handleKeyDown)
@@ -61,7 +61,7 @@ export default function(){
     },[encontrado])
     useEffect(()=>{
         setError(false)
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 if (recuperar){
                     if (codigo_correcto){
@@ -91,7 +91,7 @@ export default function(){
         else{
             ventana.current.close()
         }
-        restart()
+        restart(tiempo())
         setEncontrado(false)
         setUser("")
         setClave("")
@@ -130,7 +130,7 @@ export default function(){
     const cambiar=()=>{
         if (clave==clave_repe){
             if (comprobar(clave)){
-                init({clave:clave},"cambiarclave", {headers:{"Authorization":`Bearer ${token}`}}).then((res)=>{
+                init({clave:clave},"cambiarclave", {headers:{"Authorization":`Bearer ${token}`}}).then((res:any)=>{
                     if (Cookies.get('token')==null){
                         setError(true)
                         setMensaje("Contraseña ya usada o no hay conexión")
@@ -152,8 +152,8 @@ export default function(){
             <div className="form-page">
                 <h1>INICIAR SESIÓN</h1>
                 <div className="form">
-                    <Input ref={(el) => (inputRefs.current[0] = el)} style={{width:'100%'}} type="text" error={error} onChange={setUser} placeholder="Nick o Email"/>
-                    <Input ref={(el) => (inputRefs.current[1] = el)} style={{width:'100%'}} type="password" error={error} onChange={setClave} placeholder="Contraseña"/>
+                    <Input ref={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} type="text" error={error} onChange={setUser} placeholder="Nick o Email"/>
+                    <Input ref={(el:any) => (inputRefs.current[1] = el)} style={{width:'100%'}} type="password" error={error} onChange={setClave} placeholder="Contraseña"/>
                     <a className="btn" style={{margin:'0 auto'}} onClick={()=>{loguear()}}>Iniciar Sesión</a>
                     <a onClick={()=>{setRecuperar(true)}}>¿Contraseña olvidada?</a>
                 </div>

@@ -1,9 +1,7 @@
-import Password from "./Password"
 import { useState,useEffect, useRef } from "react"
-import { useData } from "../DataContext"
-import Input from "./Input"
-import api from "../Api"
-import { vacio,comprobar, comprobar_telefono } from "../Funciones"
+import { useData } from "../DataContext.tsx"
+import Input from "./Input.tsx"
+import { vacio,comprobar, comprobar_telefono } from "../Funciones.tsx"
 import Cookies from 'js-cookie'
 import ReactFlagsSelect from 'react-flags-select'
 export default function(){
@@ -22,17 +20,18 @@ export default function(){
     const sets=[setNombre,setApe1,setApe2,setNick,setClave,setClaveRepe,setEmail,setTelefono,setClaveRegistro]
     const labels=["Nombre","1º Apellido","2º Apellido","Nick","Contraseña","Repetir Contraseña","Email","Teléfono","Contraseña de Registro"]
     const [error,setError]=useState(false)
-    const [acierto,setAcierto]=useState(false)
     const [mensaje,setMensaje]=useState("")
-    const inputRefs=useRef([])
+    const inputRefs=useRef<any[]>([])
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
-            if (['ArrowDown','ArrowUp'].includes(e.key)){
-                let abajo=e.key=='ArrowDown'
-                let indice_actual=inputRefs.current.indexOf(document.activeElement)
-                let ultimo=campos.length-1
-                let sumador=abajo?indice_actual==ultimo?-indice_actual:1:indice_actual==0?ultimo:-1
-                inputRefs.current[indice_actual+sumador].focus()
+        const handleKeyDown=(e:any)=>{
+            if (document.activeElement!=null){
+                if (['ArrowDown','ArrowUp'].includes(e.key)){
+                    let abajo=e.key=='ArrowDown'
+                    let indice_actual=inputRefs.current.indexOf(document.activeElement)
+                    let ultimo=campos.length-1
+                    let sumador=abajo?indice_actual==ultimo?-indice_actual:1:indice_actual==0?ultimo:-1
+                    inputRefs.current[indice_actual+sumador].focus()
+                }
             }
         }
         window.addEventListener('keydown',handleKeyDown)
@@ -43,7 +42,7 @@ export default function(){
     useEffect(()=>{
         setError(false)
         setMensaje("")
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 registrar()
             }
@@ -83,7 +82,7 @@ export default function(){
                 telefono:telefono,
                 pais:pais
             }
-            init(nuevo,"register",{headers:{"X-register-key":clave_registro}}).then((res)=>{
+            init(nuevo,"register",{headers:{"X-register-key":clave_registro}}).then((res:any)=>{
                 if (Cookies.get('token')==null){
                     setError(true)
                     setMensaje(res)
@@ -98,7 +97,7 @@ export default function(){
                 {campos.map((x,i)=>{
                     return <div style={{display:'flex',gap:'0.25rem',alignItems:'center',width:'100%'}}>
                         {i==7?<ReactFlagsSelect className="banderas" searchable={true} selected={pais} onSelect={setPais}/>:null}
-                        <Input ref={(el)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={sets[i]} placeholder={labels[i]}/>
+                        <Input ref={(el:any)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={sets[i]} placeholder={labels[i]}/>
                     </div>
                 })}
                 <a onClick={()=>{registrar()}} className="btn" style={{margin:'0 auto'}}>Registrar</a>

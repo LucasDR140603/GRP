@@ -1,21 +1,21 @@
-import { useData } from "../DataContext"
-import Perfil from "./Perfil"
+import { useData } from "../DataContext.tsx"
+import Perfil from "./Perfil.tsx"
 import {MdMail,MdPhone,MdVerified} from 'react-icons/md'
-import Close from './Close'
+import Close from './Close.tsx'
 import { useState,useEffect } from 'react'
 import {parsePhoneNumberFromString,getCountryCallingCode} from 'libphonenumber-js'
-import api from "../Api"
-import Input from "./Input"
-import { comprobar, sin_acentos, vacio } from "../Funciones"
+import api from "../Api.tsx"
+import Input from "./Input.tsx"
+import { comprobar, sin_acentos, vacio } from "../Funciones.tsx"
 import ReactFlagsSelect from 'react-flags-select'
 export default function(){
     const {usuario}=useData()
-    const [edicion,setEdicion]=useState(null)
-    const [nuevo,setNuevo]=useState(null)
+    const [edicion,setEdicion]=useState<string | null>(null)
+    const [nuevo,setNuevo]=useState<any>(null)
     const [error,setError]=useState(false)
     const [acierto,setAcierto]=useState(false)
     const [mensaje,setMensaje]=useState('')
-    const Editar=(campo)=>{
+    const Editar=(campo:string)=>{
         let c=sin_acentos(campo.toLowerCase())
         let campos=[...(c=="nombre completo"?["nombre","apellido1","apellido2"]:c=="contraseña"?["clave","clave_repe"]:c=="telefono"?["pais","telefono"]:[c])]
         return <div className="ventana-emergente" style={{height:c=="telefono"?'330px':'auto'}}>
@@ -69,7 +69,7 @@ export default function(){
     }
     useEffect(()=>{
         if (edicion==null){
-            setNuevo({...usuario,clave:"",clave_repe:"",telefono:usuario.telefono.slice(-9),pais:parsePhoneNumberFromString(usuario.telefono).country.toString()})
+            setNuevo({...usuario,clave:"",clave_repe:"",telefono:usuario.telefono.slice(-9),pais:`${parsePhoneNumberFromString(usuario.telefono)!.country}`})
         }
     },[edicion])
     useEffect(()=>{
@@ -82,7 +82,7 @@ export default function(){
             <h1>DATOS DE USUARIO</h1>
             <div className="column">
                 <Perfil usuario={usuario} size={192}/>
-                <input type="file" accept="image/*" onChange={(e)=>{
+                <input type="file" accept="image/*" onChange={(e:any)=>{
                     const file=e.target.files[0]
                     if (!file) return;
                     const formData=new FormData()

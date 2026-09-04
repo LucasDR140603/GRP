@@ -1,32 +1,35 @@
 import {createContext,useState,useEffect, useContext,useRef} from "react"
 import Cookies from 'js-cookie'
-import api from "./Api"
-import { connect,getSocket,disconnect } from "./Socket"
-import { fechaSQL } from "./Funciones"
-const DataContext=createContext()
-export const DataProvider=({children})=>{
-    const prevuser=useRef(null)
-    const [cargando,setCargando]=useState(true)
-    const [usuario,setUsuario]=useState(null)
-    const [clientes,setClientes]=useState([])
-    const [centros,setCentros]=useState([])
-    const [proyectos,setProyectos]=useState([])
-    const [registros,setRegistros]=useState([])
-    const [usuarios,setUsuarios]=useState([])
+import api from "./Api.tsx"
+import { connect,getSocket,disconnect } from "./Socket.tsx"
+import { fechaSQL } from "./Funciones.tsx"
+import { Socket } from "socket.io-client"
+const DataContext=createContext(undefined)
+type elemento=Record<string,any>
+type objeto=elemento | null
+export const DataProvider=({children}:any)=>{
+    const prevuser=useRef<objeto>(null)
+    const [cargando,setCargando]=useState<boolean>(true)
+    const [usuario,setUsuario]=useState<objeto>(null)
+    const [clientes,setClientes]=useState<elemento[]>([])
+    const [centros,setCentros]=useState<elemento[]>([])
+    const [proyectos,setProyectos]=useState<elemento[]>([])
+    const [registros,setRegistros]=useState<elemento[]>([])
+    const [usuarios,setUsuarios]=useState<elemento[]>([])
     const sets=[setClientes,setCentros,setProyectos,setUsuarios,setRegistros]
     const acciones=Array('insert','update','delete')
     const tablas=Array('clientes','centros','proyectos','usuarios','registros')
-    const [socket,setSocket]=useState(null)
-    const getClienteByCentro=useRef()
-    const getCentroByProyecto=useRef()
-    const getClienteByProyecto=useRef()
-    const clientes_abiertos=clientes.filter((x)=>x.abierto)
-    const centros_abiertos=centros.filter((x)=>x.abierto)
-    const proyectos_abiertos=proyectos.filter((x)=>x.fin==null)
-    const clientes_con_centro=clientes.filter((x)=>centros_abiertos.find((y)=>x.id==y.id_cliente)!=null)
-    const clientes_con_proyecto=clientes.filter((x)=>centros.find((y)=>x.id==y.id_cliente && proyectos_abiertos.find((z)=>y.id==z.id_centro)!=null)!=null)
-    const centros_con_proyecto=centros.filter((x)=>proyectos_abiertos.find((y)=>x.id==y.id_centro)!=null)
-    const init=async(x,accion='login',config={})=>{
+    const [socket,setSocket]=useState<Socket | null>(null)
+    const getClienteByCentro:elemento=useRef<(o:elemento)=>elemento>(null)
+    const getCentroByProyecto:elemento=useRef<(o:elemento)=>elemento>(null)
+    const getClienteByProyecto:elemento=useRef<(o:elemento)=>elemento>(null)
+    const clientes_abiertos:elemento[]=clientes.filter((x)=>x.abierto)
+    const centros_abiertos:elemento[]=centros.filter((x)=>x.abierto)
+    const proyectos_abiertos:elemento[]=proyectos.filter((x)=>x.fin==null)
+    const clientes_con_centro:elemento[]=clientes.filter((x)=>centros_abiertos.find((y)=>x.id==y.id_cliente)!=null)
+    const clientes_con_proyecto:elemento[]=clientes.filter((x)=>centros.find((y)=>x.id==y.id_cliente && proyectos_abiertos.find((z)=>y.id==z.id_centro)!=null)!=null)
+    const centros_con_proyecto:elemento[]=centros.filter((x)=>proyectos_abiertos.find((y)=>x.id==y.id_centro)!=null)
+    const init=async(x:elemento,accion:string='login',config={})=>{
         setCargando(true)
         try{
             const {token,refreshToken,usuario}=(await api.post(accion,x,config)).data
@@ -36,10 +39,9 @@ export const DataProvider=({children})=>{
             setSocket(getSocket())
             setUsuario(usuario)
         }
-        catch(err){
+        catch(err:any){
             setCargando(false)
             return err.response.data
-            
         }
     }
     useEffect(()=>{
@@ -63,16 +65,16 @@ export const DataProvider=({children})=>{
         }
     },[])
     useEffect(()=>{
-        getClienteByCentro.current=(x)=>{
-            return clientes.find(y => y.id === x.id_cliente)
+        getClienteByCentro.current=(x:elemento)=>{
+            return clientes.find(y => y.id === x.id_cliente)!
         }
-        getClienteByProyecto.current=(x)=>{
-            return getClienteByCentro.current(getCentroByProyecto.current(x))
+        getClienteByProyecto.current=(x:elemento)=>{
+            return getClienteByCentro.current!(getCentroByProyecto.current!(x))
         }
     },[clientes])
     useEffect(()=>{
-        getCentroByProyecto.current=(x)=>{
-            return centros.find(y => y.id === x.id_centro)
+        getCentroByProyecto.current=(x:elemento)=>{
+            return centros.find(y => y.id === x.id_centro)!
         }
     },[centros])
     useEffect(()=>{
@@ -87,12 +89,12 @@ export const DataProvider=({children})=>{
             setRegistros((await api.get('registros/ccpu')).data)
             acciones.forEach((accion,i)=>{
                 tablas.forEach((tabla,j)=>{
-                    socket.on(`${accion}-${tabla}`,(data)=>{
+                    socket!.on(`${accion}-${tabla}`,(data:elemento)=>{
                         let nombre_objeto=tabla.substring(0,tabla.length-1)
                         sets[j](prev=>{
                             let lista=[...(i<2?[data]:[]), ...prev.filter((x)=>x.id!=data.id)]
                             if (i<2){
-                                function abierto(o){
+                                function abierto(o:elemento){
                                     return [2,4].includes(j)?o.fin==null:j==3?o.operativo:o.abierto
                                 }
                                 if ([2,3].includes(j)){
@@ -127,7 +129,7 @@ export const DataProvider=({children})=>{
                                 lista.sort((x,y)=>{
                                     let campo=j<3?'nombre':j==3?'nick':'inicio'
                                     let orden=campo=='inicio'?-1:1
-                                    function formatear(x){
+                                    function formatear(x:elemento){
                                         return (campo=='inicio'?fechaSQL(x[campo]):x[campo]).toLowerCase()
                                     }
                                     return formatear(x).localeCompare(formatear(y))*orden
@@ -140,8 +142,8 @@ export const DataProvider=({children})=>{
                                     lista.sort((x,y)=>getClienteByProyecto.current(x).nombre.toLowerCase().localeCompare(getClienteByProyecto.current(y).nombre.toLowerCase()))
                                 }
                                 if (j<2 && i==1){
-                                    let get=(x)=>{
-                                        return lista.find(y=>y.id==x[`id_${nombre_objeto}`])
+                                    let get=(x:elemento):elemento=>{
+                                        return lista.find(y=>y.id==x[`id_${nombre_objeto}`])!
                                     }
                                     const gets=[get,getClienteByProyecto.current]
                                     sets[j+1](prev=>{
@@ -153,7 +155,7 @@ export const DataProvider=({children})=>{
                                         return lista
                                     })
                                     if (j==0){
-                                        let getCliente=(x)=>{
+                                        let getCliente=(x:elemento)=>{
                                             return get(getCentroByProyecto.current(x))
                                         }
                                         sets[j+2](prev=>{
@@ -214,7 +216,7 @@ export const DataProvider=({children})=>{
         Cookies.remove("refreshToken")
         setCargando(false)
     }
-    const value={
+    const value:any={
         init,clientes_abiertos,centros_abiertos,proyectos_abiertos,clientes_con_centro,clientes_con_proyecto,centros_con_proyecto,getClienteByCentro,getClienteByProyecto,getCentroByProyecto,prevuser,cargando,usuario,usuarios,setUsuario,clientes,centros,proyectos,registros,logout
     }
     return(
@@ -223,4 +225,4 @@ export const DataProvider=({children})=>{
         </DataContext.Provider>
     )
 }
-export const useData=()=>useContext(DataContext)
+export const useData:any=()=>useContext(DataContext)

@@ -1,7 +1,18 @@
 import {FaEye,FaEyeSlash} from 'react-icons/fa'
 import { useState,useRef,useEffect } from 'react'
-import { numeros } from '../Funciones'
-export default function({value=null,onChange=(val)=>{},className="",style={},type="text",placeholder="",error=false,maxLength=null,ref=useRef()}){
+import { numeros } from '../Funciones.tsx'
+interface Props{
+    value?:any,
+    onChange:React.Dispatch<any>,
+    className?:string,
+    style?:{},
+    type:string,
+    placeholder:string,
+    error?:boolean,
+    maxLength?:number | undefined,
+    ref?:any
+}
+export default function({value=null,onChange=(val)=>{},className="",style={},type="text",placeholder="",error=false,maxLength=undefined,ref=useRef(null)}:Props){
     const [mostrar,setMostrar]=useState(false)
     const tipo=type.toLowerCase()
     const clave=tipo=="password"

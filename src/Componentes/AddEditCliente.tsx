@@ -1,15 +1,18 @@
-import { useData } from "../DataContext";
 import { useEffect, useState } from "react";
-import Checkbox from "./Checkbox";
-import api from "../Api";
-export default function({x,editar=false}){
+import Checkbox from "./Checkbox.tsx";
+import api from "../Api.tsx";
+interface Props{
+    x:Record<string,any>
+    editar:boolean
+}
+export default function({x,editar=false}:Props){
     const [acierto,setAcierto]=useState(false)
     const [error,setError]=useState(false)
     const [nombre,setNombre]=useState(x.nombre)
     const [abierto,setAbierto]=useState(x.abierto)
     useEffect(()=>{
         setAcierto(false)
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 enviar()
             }
@@ -36,7 +39,7 @@ export default function({x,editar=false}){
         <div className="column">
             <h1 style={{marginBottom:0}}>{editar?"EDITAR":"AÑADIR"} CLIENTE</h1>
             <input type="text" className={error?"red":''} placeholder="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%',border:error?'1px solid red':''}}/>
-            {x.id!=null?<Checkbox val={abierto} title={"Abierto"} setVal={setAbierto}/>:null}
+            {x.id!=null?<Checkbox val={abierto} title={"Abierto"} title2="" setVal={setAbierto}/>:null}
             <a className="btn" onClick={enviar}>Confirmar</a>
             {acierto || error?<p className={error?"red":"aqua"} style={{marginBlock:0}}>{acierto?`Cliente ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</p>:null}
         </div>

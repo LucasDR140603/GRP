@@ -2,30 +2,30 @@ import { RxTriangleLeft,RxTriangleRight } from "react-icons/rx"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2";
 import { ImArrowLeft,ImArrowRight } from "react-icons/im";
 import { format,formatDate,parse } from "date-fns";
-import Close from "./Close";
-import api from "../Api";
-import Filtro from "./Filtro";
-import Checkbox from "./Checkbox"
-import { useData } from "../DataContext";
+import Close from "./Close.tsx";
+import api from "../Api.tsx";
+import Filtro,{item} from "./Filtro.tsx";
+import Checkbox from "./Checkbox.tsx"
+import { useData } from "../DataContext.tsx";
 import { useEffect,useState,useRef } from "react";
-import { fechaSQL, inicio2000,actual, sumDias, campos, formatear, sin_acentos } from "../Funciones";
-import AddEditProyecto from "./AddEditProyecto";
+import { inicio2000,actual, sumDias, sin_acentos } from "../Funciones.tsx";
+import AddEditProyecto from "./AddEditProyecto.tsx";
 export default function(){
     const [open,setOpen]=useState(-1)
     const {clientes,centros,proyectos,usuarios,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
-    const [orden,setOrden]=useState(null)
-    const [sentido,setSentido]=useState(null)
+    const [orden,setOrden]=useState<string | null>(null)
+    const [sentido,setSentido]=useState<number | null>(null)
     const [abiertos,setAbiertos]=useState(true)
     const [cerrados,setCerrados]=useState(true)
     const [begin,setBegin]=useState(inicio2000())
     const [end,setEnd]=useState(actual())
     const [busqueda,setBusqueda]=useState("")
-    const [seleccion,setSeleccion]=useState(null)
+    const [seleccion,setSeleccion]=useState<any>(null)
     const [accion,setAccion]=useState("")
     const acciones=["Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef(null)
-    const ChangeBegin=(event)=>{
+    const ventana=useRef<any>(null)
+    const ChangeBegin=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -36,7 +36,7 @@ export default function(){
             setBegin(new Date(f.getTime()-(f.getTimezoneOffset()*60000)))
         }
     }
-    const ChangeEnd=(event)=>{
+    const ChangeEnd=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -67,12 +67,12 @@ export default function(){
             setBegin(end)
         }
     },[end])
-    const cambiarDia=(n)=>{
+    const cambiarDia=(n:number)=>{
         setBegin(sumDias(begin,n))
         setEnd(sumDias(end,n))
     }
-    const f=[clientes,centros].map((x)=>{
-        return x.map((z)=>{
+    const f:item[][]=[clientes,centros].map((x)=>{
+        return x.map((z:any)=>{
             return {
                 "id":z.id,
                 "label":z.nombre,
@@ -83,15 +83,15 @@ export default function(){
     })
     const [cli,setCli]=useState(f[0])
     const [cen,setCen]=useState(f[1])
-    const filtros=[cli,cen]
+    const filtros:item[][]=[cli,cen]
     const setsFiltros=[setCli,setCen]
-    const mostrables=proyectos.filter((x)=>{
+    const mostrables:any[]=proyectos.filter((x:any)=>{
         let i=parse(x.inicio.split("T")[0],"yyyy-MM-dd",new Date())
         let inicio=new Date(i.getTime()-(i.getTimezoneOffset()*60000))
-        return Object.values(x).concat([getCentroByProyecto.current(x).nombre,getClienteByProyecto.current(x).nombre]).map((y)=>y==null?"null":y.toString()).find((y)=>y.toLowerCase().includes(busqueda.toLowerCase()))!=null && inicio>=begin && inicio<=end && ((x.fin!=null && cerrados) || (x.fin==null && abiertos)) && cen.find((y)=>y.id==x.id_centro && y.checked)!=null
+        return Object.values(x).concat([getCentroByProyecto.current(x).nombre,getClienteByProyecto.current(x).nombre]).map((y)=>y==null?"null":y.toString()).find((y)=>y.toLowerCase().includes(busqueda.toLowerCase()))!=null && inicio>=begin && inicio<=end && ((x.fin!=null && cerrados) || (x.fin==null && abiertos)) && cen.find((y:any)=>y.id==x.id_centro && y.checked)!=null
     })
     const columnas=['Cliente','Centro','Nombre','Descripción','Día de Inicio','Hora de Inicio','Día de Fin','Hora de Fin']
-    const ordenados=()=>{
+    const ordenados:(()=>any[])=()=>{
         let lista=mostrables
         if (orden!=null && sentido!=null){
             lista.sort((x,y)=>{
@@ -100,8 +100,8 @@ export default function(){
                     if (array.length>0){
                         campo=array[array.length-1]
                     }
-                    function format(o){
-                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden)
+                    function format(o:any){
+                        let indice_columna=columnas.map((z)=>sin_acentos(z.toLowerCase())).indexOf(orden!)
                         const gets=[getClienteByProyecto,getCentroByProyecto]
                         let valor=indice_columna<2?gets[indice_columna].current(o).nombre:o[campo || "inicio"]
                         let defecto="1"
@@ -135,7 +135,7 @@ export default function(){
     useEffect(()=>{
         setCen(prev=>{
             return prev.map((x)=>{
-                let checkeado=cli.find((y)=>y.id==centros.find(z=>z.id==x.id).id_cliente).checked
+                let checkeado=cli.find((y)=>y.id==centros.find((z:any)=>z.id==x.id).id_cliente)!.checked
                 x.checked=checkeado
                 x.visible=checkeado
                 return x
@@ -153,7 +153,7 @@ export default function(){
         }
     })
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter" && accion==acciones[1]){
                 setConfirmacion(true)
             }
@@ -170,7 +170,7 @@ export default function(){
         return seleccion!=null?
             <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                 {seleccion.id==null || accion==acciones[0]?
-                <AddEditProyecto x={seleccion.id==null?seleccion:proyectos.find((y)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
+                <AddEditProyecto x={seleccion.id==null?seleccion:proyectos.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
                 :
                 <>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
                 }
@@ -221,7 +221,7 @@ export default function(){
                             let v=sin_acentos(x.toLowerCase())
                             return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
                                 return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido(sentido*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
+                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido==null?1:sentido)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
                         })}</tr>
                         <tr>{columnas.map((x,i)=>{
                             let nc=filtros.length>0 && filtros[i]!=null && filtros[i].length>0 && filtros[i].filter((y)=>!y.checked && y.visible).length>0
@@ -236,11 +236,11 @@ export default function(){
                     <tbody>
                     {ordenados().map((x)=>{
                         let terminado=x.fin!=null
-                        let campos_inicio=x.inicio.split('T')
+                        let campos_inicio:string[]=x.inicio.split('T')
                         let campos_fin=terminado?x.fin.split('T'):'En Curso'
                         campos_inicio[0]=campos_inicio[0].split('-').toReversed().reduce((x,y)=>x+"/"+y)
                         if (terminado){
-                            campos_fin[0]=campos_fin[0].split('-').toReversed().reduce((x,y)=>x+"/"+y)
+                            campos_fin[0]=campos_fin[0].split('-').toReversed().reduce((x:string,y:string)=>x+"/"+y)
                         }
                         return <tr className={x.id==seleccion?.id?'selected':terminado?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><td>{getClienteByProyecto.current(x).nombre}</td><td>{getCentroByProyecto.current(x).nombre}</td><td>{x.nombre}</td><td>{x.descripcion}</td><td>{campos_inicio[0]}</td><td>{campos_inicio[1]}</td>{!terminado?<td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</td>:<><td>{campos_fin[0]}</td><td>{campos_fin[1]}</td></>}</tr>
                     })}
@@ -253,7 +253,7 @@ export default function(){
             <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
                 {seleccion!=null?<div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                 {seleccion.id==null || accion==acciones[0]?
-                <AddEditProyecto x={seleccion.id==null?seleccion:proyectos.find((y)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
+                <AddEditProyecto x={seleccion.id==null?seleccion:proyectos.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
                 :accion==acciones[1]?
                 <div>
                     <h1 style={{marginBlock:0}}>ALERTA</h1>

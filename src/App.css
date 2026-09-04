@@ -8,7 +8,7 @@ a{
   min-height: 100vh;
 }
 .logo{
-  filter: drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 1px white) saturate(5);
+  filter: drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) saturate(5);
   height: 10vmin;
 }
 header {
@@ -16,11 +16,12 @@ header {
   position: sticky;
   top: 0;
   z-index: 2;
-  border-bottom: 1px solid azure;
+  border-bottom: 1px solid rgb(187, 187, 187);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
+  box-shadow: 0 0 10px 0px azure;
 }
 header,.useroptions{
   background-color: #0D1018;
@@ -56,7 +57,7 @@ header,.useroptions{
   min-width: 12rem;
   cursor: pointer;
 }
-.userbox:hover{
+.userbox:hover,.userbox:has(.useroptions){
   outline: 2px solid azure;
 }
 .userbox>p{
@@ -147,8 +148,13 @@ a{
   gap:1.5rem;
   display: flex;
 }
+.component{
+  position:relative;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+}
 .table-container{
-  max-height: 50vh;
   flex:1;
   overflow-y: auto;
   max-width: 90%;
@@ -324,12 +330,6 @@ input[type=checkbox]+label{
 }
 h1{
   text-align: center;
-}
-.component{
-  position:relative;
-  display: flex;
-  flex:1;
-  flex-direction: column;
 }
 .btnbox{
   position: fixed;

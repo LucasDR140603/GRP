@@ -1,37 +1,37 @@
-import { useData } from "../DataContext";
+import { useData } from "../DataContext.tsx";
 import { useEffect,useMemo,useState,useRef } from "react";
-import { fechaSQL, inicio2000,actual, sumDias, campos, formatear, sin_acentos, toExcel } from "../Funciones";
-import Filtro from "./Filtro";
-import Checkbox from "./Checkbox"
+import { fechaSQL, inicio2000,actual, sumDias, formatear, sin_acentos, toExcel, inicio_mes_actual } from "../Funciones.tsx";
+import Filtro,{item} from "./Filtro.tsx";
+import Checkbox from "./Checkbox.tsx"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2";
 import { RxTriangleLeft,RxTriangleRight } from "react-icons/rx";
 import { ImArrowLeft,ImArrowRight } from "react-icons/im";
 import { format,formatDate,parse } from "date-fns";
-import Close from "./Close";
-import AddEditRegistro from "./AddEditRegistro";
-import api from "../Api";
+import Close from "./Close.tsx";
+import AddEditRegistro from "./AddEditRegistro.tsx";
+import api from "../Api.tsx";
 import { MaterialReactTable, MRT_TableHeadCellFilterLabel, MRT_TableHeadCellSortLabel, useMaterialReactTable } from "material-react-table";
 import { Box, Button } from "@mui/material";
 export default function(){
     const [open,setOpen]=useState(-1)
     const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
-    const [orden,setOrden]=useState(null)
-    const [sentido,setSentido]=useState(null)
+    const [orden,setOrden]=useState<string | null>(null)
+    const [sentido,setSentido]=useState<number | null>(null)
     const [terminados,setTerminados]=useState(true)
     const [enCurso,setEnCurso]=useState(true)
-    const [begin,setBegin]=useState(inicio2000())
+    const [begin,setBegin]=useState(inicio_mes_actual())
     const [end,setEnd]=useState(actual())
     const [busqueda,setBusqueda]=useState("")
-    const [seleccion,setSeleccion]=useState(null)
+    const [seleccion,setSeleccion]=useState<Record<string,any> | null>(null)
     const [accion,setAccion]=useState("")
     const acciones=["Terminar","Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef(null)
-    const f=[clientes,centros,proyectos,usuarios].map((x,i)=>{
-        return x.filter((y)=>{
+    const ventana=useRef<any>(null)
+    const f:item[][]=[clientes,centros,proyectos,usuarios].map((x,i)=>{
+        return x.filter((y:any)=>{
                     let campo=i==2?'fin':i==3?'operativo':'abierto'
                     return y[campo]==(i==2?null:true)
-                }).map((z)=>{
+                }).map((z:any)=>{
                     let campo=i==3?'nick':'nombre'
                     return {
                         "id":z.id,
@@ -47,7 +47,7 @@ export default function(){
     const [usu,setUsu]=useState(f[3])
     const filtros=[cli,cen,pro,usu]
     const setsFiltros=[setCli,setCen,setPro,setUsu]
-    const mostrables=registros.filter((x)=>{
+    const mostrables:any[]=registros.filter((x:any)=>{
         let i=parse(fechaSQL(x.inicio).split("T")[0],"yyyy-MM-dd",new Date())
         let inicio=new Date(i.getTime()-(i.getTimezoneOffset()*60000))
         return Object.values(x).map((y,i)=>y==null?Object.keys(x)[i]=='duracion'?'En Curso':"null":y.toString()).find((y)=>y.toLowerCase().includes(busqueda.toLowerCase()))!=null && inicio>=begin && inicio<=end && ((x.fin!=null && terminados) || (x.fin==null && enCurso)) && pro.find((y)=>y.id==x.id_proyecto && y.checked)!=null && usu.find((y)=>y.id==x.id_usuario && y.checked)!=null
@@ -55,7 +55,7 @@ export default function(){
     useEffect(()=>{
         setCen(prev=>{
             return prev.map((x)=>{
-                let checkeado=cli.find((y)=>y.id==centros.find(z=>z.id==x.id).id_cliente).checked
+                let checkeado=cli.find((y)=>y.id==centros.find((z:any)=>z.id==x.id).id_cliente)!.checked
                 x.checked=checkeado
                 x.visible=checkeado
                 return x
@@ -65,7 +65,7 @@ export default function(){
     useEffect(()=>{
         setPro(prev=>{
             return prev.map((x)=>{
-                let checkeado=cen.find((y)=>y.id==proyectos.find(z=>z.id==x.id).id_centro).checked
+                let checkeado=cen.find((y)=>y.id==proyectos.find((z:any)=>z.id==x.id).id_centro)!.checked
                 x.checked=checkeado
                 x.visible=checkeado
                 return x
@@ -79,7 +79,7 @@ export default function(){
     },[orden])
     const columnas=['Cliente','Centro','Proyecto','Usuario','Día de Inicio','Hora de Inicio','Día de Fin','Hora de Fin','Descripción','Observaciones','Duración Total']
     const ordenados=()=>{
-        let lista=mostrables
+        let lista:any[]=mostrables
         if (orden!=null && sentido!=null){
             lista.sort((x,y)=>{
                     let campo=orden
@@ -88,7 +88,7 @@ export default function(){
                         campo=array[array.length-1]
                     }
                     let duracion=orden==columnas[columnas.length-1].toLowerCase()
-                    function format(o){
+                    function format(o:any){
                         let valor=duracion?o.fin==null?0:o.duracion:o[campo || "inicio"]
                         let defecto=duracion?0:"1"
                         let campos_fecha=['día','hora']
@@ -110,7 +110,7 @@ export default function(){
         }
         return lista
     }
-    const ChangeBegin=(event)=>{
+    const ChangeBegin=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -121,7 +121,7 @@ export default function(){
             setBegin(new Date(f.getTime()-(f.getTimezoneOffset()*60000)))
         }
     }
-    const ChangeEnd=(event)=>{
+    const ChangeEnd=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -154,19 +154,19 @@ export default function(){
     },[end])
     useEffect(()=>{
         if (accion==acciones[0]){
-            let x={...seleccion,inicio:seleccion.inicio.split(' ')[0].split('/').reverse().reduce((x,y)=>x+"-"+y)+" "+seleccion.inicio.split(' ')[1]}
+            let x:Record<string,any>={...seleccion,inicio:seleccion!.inicio.split(' ')[0].split('/').reverse().reduce((x:string,y:string)=>x+"-"+y)+" "+seleccion!.inicio.split(' ')[1]}
             x.fin=formatear(new Date(),0,true)
             api.put('registros',x).then((res)=>{
                 setSeleccion(null)
             })
         }
         else if (accion==acciones[2] && confirmacion){
-            api.delete(`registros/${seleccion.id}`).then((res)=>{
+            api.delete(`registros/${seleccion!.id}`).then((res)=>{
                 setSeleccion(null)
             })
         }
     },[accion,confirmacion])
-    const cambiarDia=(n)=>{
+    const cambiarDia=(n:number)=>{
         setBegin(sumDias(begin,n))
         setEnd(sumDias(end,n))
     }
@@ -176,7 +176,7 @@ export default function(){
         }
     })
     useEffect(()=>{
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter" && accion==acciones[2]){
                 setConfirmacion(true)
             }
@@ -186,21 +186,21 @@ export default function(){
             window.removeEventListener('keydown',handleKeyDown)
         }
     },[accion])
-    const opciones=()=>{
-        if (seleccion!=null && seleccion.id!=null && mostrables.find((x)=>x.id==seleccion.id)==null){
-            setSeleccion(null)
-        }
-        return seleccion!=null?
-            <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
-                {seleccion.id==null || accion==acciones[1]?
-                <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
-                :
-                <>{acciones.map((x,i)=>(registros.filter((y)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
-                }
-                <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || accion==acciones[1]}/>
-            </div>
-            :null
-    }
+    // const opciones=()=>{
+    //     if (seleccion!=null && seleccion.id!=null && mostrables.find((x)=>x.id==seleccion.id)==null){
+    //         setSeleccion(null)
+    //     }
+    //     return seleccion!=null?
+    //         <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
+    //             {seleccion.id==null || accion==acciones[1]?
+    //             <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
+    //             :
+    //             <>{acciones.map((x,i)=>(registros.filter((y)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
+    //             }
+    //             <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || accion==acciones[1]}/>
+    //         </div>
+    //         :null
+    // }
     const confirmar=()=>{
         return accion==acciones[2]?
         <div className="ventana-emergente">
@@ -212,19 +212,19 @@ export default function(){
         :null
     }
     const duracion_total=mostrables.filter((x)=>x.fin!=null).reduce((x,y)=>x+y.duracion,0.0).toFixed(1)
-    const columns=useMemo(
-        ()=>columnas.map((x)=>{
-            return {
-                accessorKey:x.toLocaleLowerCase(),
-                header: x,
-            }
-        })
-    )
+    // const columns=useMemo(
+    //     ()=>columnas.map((x)=>{
+    //         return {
+    //             accessorKey:x.toLocaleLowerCase(),
+    //             header: x,
+    //         }
+    //     })
+    // )
     return (
         <div className="component">
             <div className="btnbox">
                 <a className="btn" onClick={()=>{setSeleccion(seleccion==null?()=>{
-                    let ultimo={...registros.find((x)=>x.id_usuario==usuario.id),inicio:formatDate(new Date(),"dd/MM/yyyy HH:mm"),fin:null,descripcion:null}
+                    let ultimo={...registros.find((x:any)=>x.id_usuario==usuario.id),inicio:formatDate(new Date(),"dd/MM/yyyy HH:mm"),fin:null,descripcion:null}
                     delete ultimo.id
                     return ultimo
                 }:null)}}>Añadir</a>
@@ -247,6 +247,35 @@ export default function(){
                         return Object.keys(registro).map((y)=>({[y.charAt(0).toUpperCase() + y.slice(1)]:registro[y]})).reduce((y,z)=>({...y,...z}),{})
                     }))
                 }}>Excel</a>
+                {pro.filter((x)=>x.checked).length==1?
+                <a className='btn' onClick={()=>{
+                    let r=ordenados().toSorted((x,y)=>fechaSQL(y.inicio).localeCompare(fechaSQL(x.inicio))).filter((x)=>x.duracion!=null)
+                    let proyecto_marcado=proyectos.find((x:any)=>x.id==pro.find((x)=>x.checked)!.id)
+                    let centro_marcado=getCentroByProyecto.current(proyecto_marcado)
+                    let cliente_marcado=getClienteByProyecto.current(proyecto_marcado)
+                    toExcel(r.map((x)=>{
+                        let fecha=x.inicio.split(' ')[0]
+                        let u=usuarios.filter((y:any)=>y.id==x.id_usuario)[0]
+                        return {
+                            'FECHA':fecha,
+                            'LUGAR':'',
+                            'TRAB':u.nombre.charAt(0)+u.apellido1.charAt(0),
+                            '':'',
+                            'DURACION Dec.':x.duracion,
+                            'D':x.desplazamiento>0?1:0,
+                            'M':x.manutencion>0?1:0,
+                            'IHE':x.duracion>8?(8-x.duracion):'',
+                            ' ':'',
+                            'DESCRIPCION':x.descripcion??'',
+                            'PROYECTO':x.proyecto,
+                            'Observaciones':x.observaciones??''
+                        }
+                    }),'PARTE TRABAJOS '+cliente_marcado.nombre+"_"+centro_marcado.nombre+" "+format(begin,'dd-MM-yyyy')+" - "+format(end,'dd-MM-yyyy')+".xlsx","TRABAJOS REALIZADOS POR ADMINISTRACION "+cliente_marcado.nombre+"_"+centro_marcado.nombre+" "+format(begin,'dd-MM-yyyy')+" - "+format(end,'dd-MM-yyyy'),['D: Desplazamientos, M: manutención, IHE: Incremento Horas Extra','Estado: PA: Pendiente albarán // PP: Pendiente pedido //PF: Pendiente facturar //SC: Sin cargo'],true)
+                
+                }}>
+                    Parte de Trabajo
+                </a>
+                :null}
             </div>
             <h1>REGISTROS</h1>
             <div className="options">
@@ -272,7 +301,7 @@ export default function(){
                             let v=sin_acentos(x.toLowerCase())
                             return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
                                 return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido(sentido*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
+                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido!=null?sentido:1)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
                         })}</tr>
                         <tr>{columnas.map((x,i)=>{
                             let nc=filtros.length>0 && filtros[i]!=null && filtros[i].length>0 && filtros[i].filter((y)=>!y.checked && y.visible).length>0
@@ -300,12 +329,12 @@ export default function(){
             <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
                 {seleccion!=null?<div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                 {seleccion.id==null || accion==acciones[1]?
-                <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
+                <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
                 :accion==acciones[2]?
                 <div><h1 style={{marginBlock:0}}>ALERTA</h1>
                 <p>Va a eliminar un registro. Acción irreversible</p>
                 <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a></div>
-                :<>{acciones.map((x,i)=>(registros.filter((y)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
+                :<>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
                 }
                 <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [1,2].includes(acciones.indexOf(accion))}/>
                 </div>:null}

@@ -1,21 +1,25 @@
-import { useData } from "../DataContext";
+import { useData } from "../DataContext.tsx";
 import { useEffect, useState } from "react";
-import Checkbox from "./Checkbox";
-import api from "../Api";
-export default function({x,editar=false}){
-    const [acierto,setAcierto]=useState(false)
-    const [error,setError]=useState(false)
-    const [nombre,setNombre]=useState(x.nombre)
+import Checkbox from "./Checkbox.tsx";
+import api from "../Api.tsx";
+interface Props{
+    x:Record<string,any>
+    editar:boolean
+}
+export default function({x,editar=false}:Props){
+    const [acierto,setAcierto]=useState<boolean>(false)
+    const [error,setError]=useState<boolean>(false)
+    const [nombre,setNombre]=useState(x['nombre'])
     const {usuario,clientes_abiertos,getClienteByCentro}=useData()
-    const [cliente,setCliente]=useState(clientes_abiertos.find((y)=>y.id==x.id_cliente))
+    const [cliente,setCliente]=useState(clientes_abiertos.find((y:Record<string,any>)=>y.id==x.id_cliente))
     const [abierto,setAbierto]=useState(x.abierto)
     const selects=()=>{
-        if (clientes_abiertos.find((y)=>y.id==cliente.id)==null){
+        if (clientes_abiertos.find((y:Record<string,any>)=>y.id==cliente.id)==null){
             setCliente(clientes_abiertos[0])
         }
         return <>
-            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_abiertos.find((y)=>y.id==e.target.value))}}>
-            {clientes_abiertos.map((y)=>{
+            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_abiertos.find((y:Record<string,any>)=>y.id==e.target.value))}}>
+            {clientes_abiertos.map((y:Record<string,any>)=>{
                 return <option value={y.id}>{y.nombre}</option>
             })}
             </select>
@@ -23,7 +27,7 @@ export default function({x,editar=false}){
     }
     useEffect(()=>{
         setAcierto(false)
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 enviar()
             }

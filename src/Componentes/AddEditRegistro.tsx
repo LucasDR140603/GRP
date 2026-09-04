@@ -1,14 +1,19 @@
 import { format, formatDate, parse } from "date-fns";
-import { useData } from "../DataContext";
+import { useData } from "../DataContext.tsx";
 import { useEffect, useRef, useState } from "react";
-import Checkbox from "./Checkbox";
-import api from "../Api";
-export default function({x,editar=false}){
+import Checkbox from "./Checkbox.tsx";
+import api from "../Api.tsx";
+import { json } from "node:stream/consumers";
+interface Props{
+    x:Record<string,any>
+    editar:boolean
+}
+export default function({x,editar=false}:Props){
     const [acierto,setAcierto]=useState(false)
-    const {usuario,registros,proyectos_abiertos,centros_con_proyecto,clientes_con_proyecto}=useData()
-    const [cliente,setCliente]=useState(clientes_con_proyecto.find((y)=>y.id==x.id_cliente))
-    const [centro,setCentro]=useState(centros_con_proyecto.find((y)=>y.id==x.id_centro))
-    const [proyecto,setProyecto]=useState(proyectos_abiertos.find((y)=>y.id==x.id_proyecto))
+    const {proyectos_abiertos,centros_con_proyecto,clientes_con_proyecto}=useData()
+    const [cliente,setCliente]=useState(clientes_con_proyecto.find((y:any)=>y.id==x.id_cliente))
+    const [centro,setCentro]=useState(centros_con_proyecto.find((y:any)=>y.id==x.id_centro))
+    const [proyecto,setProyecto]=useState(proyectos_abiertos.find((y:any)=>y.id==x.id_proyecto))
     const [descripcion,setDescripcion]=useState(x.descripcion)
     const [observaciones,setObservaciones]=useState(x.observaciones)
     const [begin,setBegin]=useState(parse(x.inicio,"dd/MM/yyyy HH:mm",new Date()))
@@ -20,30 +25,30 @@ export default function({x,editar=false}){
     const campos_gasto=[km,desplazamiento,manutencion,alojamiento]
     const sets_gasto=[setKm,setDesplazamiento,setManutencion,setAlojamiento]
     const labels_gasto=["Km","Desplazamiento","Manutención","Alojamiento"]
-    const descRef=useRef(null)
-    const obsRef=useRef(null)
-    const [foco,setFoco]=useState(false)
+    const descRef=useRef<any>(null)
+    const obsRef=useRef<any>(null)
+    const [error,setError]=useState<boolean>(false)
     useEffect(()=>{
         if (cliente.id!=centro.id_cliente){
-            setCentro(centros_con_proyecto.find((y)=>y.id_cliente==cliente.id))
+            setCentro(centros_con_proyecto.find((y:any)=>y.id_cliente==cliente.id))
         }
     },[cliente.id])
     useEffect(()=>{
         if (centro.id!=proyecto.id_centro){
-            setProyecto(proyectos_abiertos.find((y)=>y.id_centro==centro.id))
+            setProyecto(proyectos_abiertos.find((y:any)=>y.id_centro==centro.id))
         }
     },[centro.id])
-    useEffect(()=>{
-        if (begin>end && end!=null){
-            setEnd(begin)
-        }
-    },[begin])
-    useEffect(()=>{
-        if (begin>end && end!=null){
-            setBegin(end)
-        }
-    },[end])
-    const ChangeBegin=(event)=>{
+    // useEffect(()=>{
+    //     if (end!=null && begin>end){
+    //         setEnd(begin)
+    //     }
+    // },[begin])
+    // useEffect(()=>{
+    //     if (end!=null && begin>end){
+    //         setBegin(end)
+    //     }
+    // },[end])
+    const ChangeBegin=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -54,7 +59,7 @@ export default function({x,editar=false}){
             setBegin(f)
         }
     }
-    const ChangeEnd=(event)=>{
+    const ChangeEnd=(event:any)=>{
         let v=event.target.value
         const valores=v.split("-")
         if (v.length==0 || valores[0].length>4){
@@ -66,28 +71,28 @@ export default function({x,editar=false}){
         }
     }
     const selects=()=>{
-        if (clientes_con_proyecto.find((y)=>y.id==cliente.id)==null){
+        if (clientes_con_proyecto.find((y:any)=>y.id==cliente.id)==null){
             setCliente(clientes_con_proyecto[0])
         }
-        else if (centros_con_proyecto.find((y)=>y.id==centro.id)==null){
-            setCentro(centros_con_proyecto.find((y)=>y.id_cliente==cliente.id))
+        else if (centros_con_proyecto.find((y:any)=>y.id==centro.id)==null){
+            setCentro(centros_con_proyecto.find((y:any)=>y.id_cliente==cliente.id))
         }
-        else if (proyectos_abiertos.find((y)=>y.id==proyecto.id)==null){
-            setProyecto(proyectos_abiertos.find((y)=>y.id_centro==centro.id))
+        else if (proyectos_abiertos.find((y:any)=>y.id==proyecto.id)==null){
+            setProyecto(proyectos_abiertos.find((y:any)=>y.id_centro==centro.id))
         }
         return <>
-            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_con_proyecto.find((y)=>y.id==e.target.value))}}>
-            {clientes_con_proyecto.map((y)=>{
+            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
+            {clientes_con_proyecto.map((y:any)=>{
                 return <option value={y.id}>{y.nombre}</option>
             })}
             </select>
-            <select value={centro.id} onChange={(e)=>{setCentro(centros_con_proyecto.find((y)=>y.id==e.target.value))}}>
-            {centros_con_proyecto.filter((y)=>y.id_cliente==cliente.id).map((y)=>{
+            <select value={centro.id} onChange={(e)=>{setCentro(centros_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
+            {centros_con_proyecto.filter((y:any)=>y.id_cliente==cliente.id).map((y:any)=>{
                 return <option value={y.id}>{y.nombre}</option>
             })}
             </select>
-            <select value={proyecto.id} onChange={(e)=>{setProyecto(proyectos_abiertos.find((y)=>y.id==e.target.value))}}>
-            {proyectos_abiertos.filter((y)=>y.id_centro==centro.id).map((y)=>{
+            <select value={proyecto.id} onChange={(e)=>{setProyecto(proyectos_abiertos.find((y:any)=>y.id==e.target.value))}}>
+            {proyectos_abiertos.filter((y:any)=>y.id_centro==centro.id).map((y:any)=>{
                 return <option value={y.id}>{y.nombre}</option>
             })}
             </select>
@@ -95,7 +100,7 @@ export default function({x,editar=false}){
     }
     useEffect(()=>{
         setAcierto(false)
-        const handleKeyDown=(e)=>{
+        const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 if(![descRef.current,obsRef.current].includes(document.activeElement)){
                     enviar()
@@ -113,17 +118,20 @@ export default function({x,editar=false}){
         const accion=editar?api.put:api.post
         accion('registros',nuevo).then((res)=>{
             setAcierto(true)
+        }).catch((err)=>{
+            setError(true)
         })
     }
+    const error_fechas=end!=null && begin>end
     return <div className="column">
         <h1 style={{margin:0}}>{editar?"EDITAR":"AÑADIR"} REGISTRO</h1>
         {selects()}
         <div style={{display:'grid',rowGap:'1rem',columnGap:'1rem',gridTemplateRows:`repeat(${x.fin==null && end!=null?5:4},1fr)`}}>
             <textarea ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} placeholder="Descripción"/>
             <textarea ref={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} placeholder="Observaciones"/>
-            <input type="datetime-local" onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
-            {x.id==null || x.fin==null?<div style={{display:'flex',gap:'0.5rem',gridRow:4,alignItems:'center'}}><input type="checkbox" id={"terminado"} onChange={(e)=>{setEnd(end!=null?null:begin)}}/><label for='terminado'>Terminado</label></div>:null}
-            {end!=null?<input style={{gridColumn:'1',gridRow:x.fin==null?5:4}} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
+            <input style={error_fechas?{borderColor:'red'}:{}} type="datetime-local" onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
+            {x.id==null || x.fin==null?<div style={{display:'flex',gap:'0.5rem',gridRow:4,alignItems:'center'}}><input type="checkbox" id={"terminado"} onChange={(e)=>{setEnd(end!=null?null:begin)}}/><label htmlFor='terminado'>Terminado</label></div>:null}
+            {end!=null?<input style={{gridColumn:'1',gridRow:x.fin==null?5:4,...(error_fechas?{borderColor:'red'}:{})}} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
             {campos_gasto.map((y,i)=>{
                 return <div style={{gridColumn:'2',gridRow:(i+1)}}>
                     <label>{labels_gasto[i]}: {y}</label>
@@ -133,5 +141,6 @@ export default function({x,editar=false}){
         </div>
         <a className="btn" onClick={enviar}>Confirmar</a>
         {acierto?<p className="aqua" style={{marginBlock:0}}>Registro {editar?"editado":"añadido"} con éxito</p>:null}
+        {error?<p className="red" style={{marginBlock:0}}>ERROR{error_fechas?": La fecha de inicio no debe ser mayor a la de fin.":""}</p>:null}
     </div>
 }

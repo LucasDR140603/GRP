@@ -247,24 +247,28 @@ export default function(){
                         return Object.keys(registro).map((y)=>({[y.charAt(0).toUpperCase() + y.slice(1)]:registro[y]})).reduce((y,z)=>({...y,...z}),{})
                     }))
                 }}>Excel</a>
-                {pro.filter((x)=>x.checked).length==1?
+                {cen.filter((x)=>x.checked).length==1?
                 <a className='btn' onClick={()=>{
-                    let r=ordenados().toSorted((x,y)=>fechaSQL(y.inicio).localeCompare(fechaSQL(x.inicio))).filter((x)=>x.duracion!=null)
-                    let proyecto_marcado=proyectos.find((x:any)=>x.id==pro.find((x)=>x.checked)!.id)
-                    let centro_marcado=getCentroByProyecto.current(proyecto_marcado)
-                    let cliente_marcado=getClienteByProyecto.current(proyecto_marcado)
+                    let r=ordenados().toSorted((x,y)=>fechaSQL(x.inicio).localeCompare(fechaSQL(y.inicio))).filter((x)=>x.duracion!=null)
+                    let centro_marcado=centros.find((x:any)=>x.id==cen.find((x)=>x.checked)!.id)
+                    let cliente_marcado=getClienteByCentro.current(centro_marcado)
                     toExcel(r.map((x)=>{
                         let fecha=x.inicio.split(' ')[0]
                         let u=usuarios.filter((y:any)=>y.id==x.id_usuario)[0]
+                        let d=x.duracion
+                        let cifras=d.toString().split('.').map((x:string)=>parseInt(x))
+                        let duracion_final=cifras[0]
+                        let decimal=cifras.slice(-1)[0]
+                        duracion_final+=decimal>5?1:decimal>0?0.5:0
                         return {
                             'FECHA':fecha,
                             'LUGAR':'',
                             'TRAB':u.nombre.charAt(0)+u.apellido1.charAt(0),
                             '':'',
-                            'DURACION Dec.':x.duracion,
+                            'DURACION Dec.':duracion_final,
                             'D':x.desplazamiento>0?1:0,
                             'M':x.manutencion>0?1:0,
-                            'IHE':x.duracion>8?(8-x.duracion):'',
+                            'IHE':duracion_final>8?(duracion_final-8):'',
                             ' ':'',
                             'DESCRIPCION':x.descripcion??'',
                             'PROYECTO':x.proyecto,

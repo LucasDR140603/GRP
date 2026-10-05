@@ -4,6 +4,8 @@ import Input from "./Input.tsx"
 import { vacio,comprobar, comprobar_telefono } from "../Funciones.tsx"
 import Cookies from 'js-cookie'
 import ReactFlagsSelect from 'react-flags-select'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 export default function(){
     const {init}=useData()
     const [pais,setPais]=useState("ES")
@@ -94,13 +96,17 @@ export default function(){
         <div className="form-page">
             <h1>REGISTRAR</h1>
             <div className="form">
+                {/* <TextField onChange={(e)=>{sets[0](e.target.value)}} label={labels[0]}/>
+                <TextField onChange={(e)=>{sets[1](e.target.value)}} label={labels[1]}/>
+                <TextField onChange={(e)=>{sets[2](e.target.value)}} label={labels[2]}/>
+                <TextField onChange={(e)=>{sets[3](e.target.value)}} label={labels[3]}/> */}
                 {campos.map((x,i)=>{
                     return <div style={{display:'flex',gap:'0.25rem',alignItems:'center',width:'100%'}}>
                         {i==7?<ReactFlagsSelect className="banderas" searchable={true} selected={pais} onSelect={setPais}/>:null}
-                        <Input ref={(el:any)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={sets[i]} placeholder={labels[i]}/>
+                        <Input ref={(el:any)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={(e)=>{sets[i](e.target.value)}} label={labels[i]}/>
                     </div>
                 })}
-                <a onClick={()=>{registrar()}} className="btn" style={{margin:'0 auto'}}>Registrar</a>
+                <Button variant="outlined" onClick={()=>{registrar()}}>Registrar</Button>
                 {error?<p className="red">{mensaje}</p>:null}
             </div>
         </div>

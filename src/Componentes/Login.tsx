@@ -9,6 +9,8 @@ import api from "../Api.tsx";
 import { comprobar } from "../Funciones.tsx";
 import {useTimer} from 'react-timer-hook'
 import Turnstile from "react-turnstile";
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 export default function(){
     const {init}=useData()
     const [user,setUser]=useState("")
@@ -152,9 +154,9 @@ export default function(){
             <div className="form-page">
                 <h1>INICIAR SESIÓN</h1>
                 <div className="form">
-                    <Input ref={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} type="text" error={error} onChange={setUser} placeholder="Nick o Email"/>
-                    <Input ref={(el:any) => (inputRefs.current[1] = el)} style={{width:'100%'}} type="password" error={error} onChange={setClave} placeholder="Contraseña"/>
-                    <a className="btn" style={{margin:'0 auto'}} onClick={()=>{loguear()}}>Iniciar Sesión</a>
+                    <TextField ref={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} label='Nick o Email' error={error} onChange={(e)=>{setUser(e.target.value)}}/>
+                    <Password label="Contraseña" onChange={(e)=>{setClave(e.target.value)}} error={error}/>
+                    <Button variant="outlined" onClick={()=>{loguear()}}>Iniciar Sesión</Button>
                     <a onClick={()=>{setRecuperar(true)}}>¿Contraseña olvidada?</a>
                 </div>
             </div>
@@ -178,8 +180,8 @@ export default function(){
                     </>
                     :<>
                         <h1>CAMBIAR CONTRASEÑA</h1>
-                        <Input type="password" onChange={setClave} className={error?"red":""} placeholder="Contraseña Nueva"/>
-                        <Input type="password" onChange={setClaveRepe} className={error?"red":""} placeholder="Repetir Contraseña"/>
+                        <Input type="password" onChange={setClave} className={error?"red":""} label="Contraseña Nueva"/>
+                        <Input type="password" onChange={setClaveRepe} className={error?"red":""} label="Repetir Contraseña"/>
                         <a className="btn" onClick={cambiar}>Enviar</a>
                     </>}
                     {error?<p className="red">{mensaje}</p>:""}

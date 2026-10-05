@@ -94,7 +94,7 @@ export function formatear(fecha:Date,dias:number=0,hora:boolean=false){
             m=12
             y-=1
         }
-        d=m==2?bisiesto(y)?29:28:(m%2==0 && m<8)?30:31
+        d=m==2?bisiesto(y)?29:28:((m%2==0 && m<8) || (m%2==1 && m>8))?30:31
     }
     return `${y.toString().padStart(4, '0')}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}${hora?`T${fecha.getHours().toString().padStart(2,'0')}:${fecha.getMinutes().toString().padStart(2,'0')}`:''}`
 }

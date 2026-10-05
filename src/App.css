@@ -16,12 +16,12 @@ header {
   position: sticky;
   top: 0;
   z-index: 2;
-  border-bottom: 1px solid rgb(187, 187, 187);
+  border-bottom: 1px solid #f0ffff69;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  box-shadow: 0 0 10px 0px azure;
+  /* box-shadow: 0 0 10px 0px azure; */
 }
 header,.useroptions{
   background-color: #0D1018;
@@ -32,7 +32,7 @@ header,.useroptions{
 .useroptions{
   display: flex;
   flex-direction: column;
-  border:1px solid azure;
+  border:1px solid #f0ffff;
   max-width: 100%;
   font-size: 1rem;
 }
@@ -45,7 +45,7 @@ header,.useroptions{
   text-align: center;
 }
 .useroptions>a:hover{
-  background-image: linear-gradient(gold,#00000000,gold);
+  background-image: linear-gradient(#ffd700,#00000000,gold);
 }
 .userbox{
   position: relative;
@@ -111,7 +111,9 @@ input,textarea,select{
 table .btn{
   padding: 0 0.5rem;
 }
-
+.enlaces a{
+  font-size: 1rem;
+}
 .enlace,.marcado,.btn{
   display: block;
   width: fit-content;
@@ -310,7 +312,7 @@ input{
 input::placeholder,textarea::placeholder{
   color: rgb(165, 147, 47);
 }
-textarea:focus,input:not([type='checkbox']):focus{
+textarea:focus,input:not([type='checkbox']):not(.MuiInputBase-input):focus{
   box-shadow: gold 0px 0px 6px 0px;
 }
 input[type=checkbox]{

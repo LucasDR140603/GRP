@@ -12,6 +12,13 @@ import AddEditRegistro from "./AddEditRegistro.tsx";
 import api from "../Api.tsx";
 import { MaterialReactTable, MRT_TableHeadCellFilterLabel, MRT_TableHeadCellSortLabel, useMaterialReactTable } from "material-react-table";
 import { Box, Button } from "@mui/material";
+import MenuItem from '@mui/material/MenuItem'
+import Menu from '@mui/material/Menu'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
 export default function(){
     const [open,setOpen]=useState(-1)
     const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
@@ -27,6 +34,7 @@ export default function(){
     const acciones=["Terminar","Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
     const ventana=useRef<any>(null)
+    const [abierto,setAbierto]=useState<boolean>(false)
     const f:item[][]=[clientes,centros,proyectos,usuarios].map((x,i)=>{
         return x.filter((y:any)=>{
                     let campo=i==2?'fin':i==3?'operativo':'abierto'
@@ -136,10 +144,12 @@ export default function(){
         setAccion("")
         setConfirmacion(false)
         if (seleccion!=null){
-            ventana.current.showModal()
+            // ventana.current.showModal()
+            setAbierto(true)
         }
         else{
-            ventana.current.close()
+            // ventana.current.close()
+            setAbierto(false)
         }
     },[seleccion])
     useEffect(()=>{
@@ -223,12 +233,28 @@ export default function(){
     return (
         <div className="component">
             <div className="btnbox">
-                <a className="btn" onClick={()=>{setSeleccion(seleccion==null?()=>{
-                    let ultimo={...registros.find((x:any)=>x.id_usuario==usuario.id),inicio:formatDate(new Date(),"dd/MM/yyyy HH:mm"),fin:null,descripcion:null}
-                    delete ultimo.id
-                    return ultimo
-                }:null)}}>Añadir</a>
-                <a className="btn" onClick={()=>{
+                <Button variant='outlined' onClick={()=>{setSeleccion(seleccion==null?()=>{
+                    let ultimo=registros.find((x:any)=>x.id_usuario==usuario.id)??{
+                        "cliente": clientes[0].nombre,
+                        "centro": centros.find((x:any)=>x.id_cliente==clientes[0].id).nombre,
+                        "proyecto": proyectos.find((x:any)=>x.id_centro==centros.find((y:any)=>y.id_cliente==clientes[0].id).id).nombre,
+                        "usuario": usuario.nick,
+                        "id_cliente": clientes[0].id,
+                        "id_centro": centros.find((x:any)=>x.id_cliente==clientes[0].id).id,
+                        "id_proyecto": proyectos.find((x:any)=>x.id_centro==centros.find((y:any)=>y.id_cliente==clientes[0].id).id).id,
+                        "id_usuario": usuario.id,
+                        "id": "",
+                        "observaciones": null,
+                        "km": 0,
+                        "desplazamiento": 0,
+                        "manutencion": 0,
+                        "alojamiento": 0,
+                    }
+                    let nuevo={...ultimo,inicio:formatDate(new Date(),"dd/MM/yyyy HH:mm"),fin:null,descripcion:null}
+                    delete nuevo.id
+                    return nuevo
+                }:null)}}>Añadir</Button>
+                <Button variant='outlined' onClick={()=>{
                     toExcel(ordenados().map((x)=>{
                         let terminado=x.fin!=null
                         let campos_inicio=x.inicio.split(' ')
@@ -246,9 +272,9 @@ export default function(){
                         registro["Duración Total: "+duracion_total]=x.duracion ?? 'En Curso'
                         return Object.keys(registro).map((y)=>({[y.charAt(0).toUpperCase() + y.slice(1)]:registro[y]})).reduce((y,z)=>({...y,...z}),{})
                     }))
-                }}>Excel</a>
+                }}>Excel</Button>
                 {cen.filter((x)=>x.checked).length==1?
-                <a className='btn' onClick={()=>{
+                <Button variant='outlined' onClick={()=>{
                     let r=ordenados().toSorted((x,y)=>fechaSQL(x.inicio).localeCompare(fechaSQL(y.inicio))).filter((x)=>x.duracion!=null)
                     let centro_marcado=centros.find((x:any)=>x.id==cen.find((x)=>x.checked)!.id)
                     let cliente_marcado=getClienteByCentro.current(centro_marcado)
@@ -275,10 +301,9 @@ export default function(){
                             'Observaciones':x.observaciones??''
                         }
                     }),'PARTE TRABAJOS '+cliente_marcado.nombre+"_"+centro_marcado.nombre+" "+format(begin,'dd-MM-yyyy')+" - "+format(end,'dd-MM-yyyy')+".xlsx","TRABAJOS REALIZADOS POR ADMINISTRACION "+cliente_marcado.nombre+"_"+centro_marcado.nombre+" "+format(begin,'dd-MM-yyyy')+" - "+format(end,'dd-MM-yyyy'),['D: Desplazamientos, M: manutención, IHE: Incremento Horas Extra','Estado: PA: Pendiente albarán // PP: Pendiente pedido //PF: Pendiente facturar //SC: Sin cargo'],true)
-                
                 }}>
                     Parte de Trabajo
-                </a>
+                </Button>
                 :null}
             </div>
             <h1>REGISTROS</h1>
@@ -330,7 +355,7 @@ export default function(){
                     </tfoot>
                 </table>
             </div>}
-            <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
+            {/* <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
                 {seleccion!=null?<div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
                 {seleccion.id==null || accion==acciones[1]?
                 <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
@@ -342,7 +367,37 @@ export default function(){
                 }
                 <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [1,2].includes(acciones.indexOf(accion))}/>
                 </div>:null}
-            </dialog>
+            </dialog> */}
+            <Dialog onClose={(event,reason)=>{
+                // alert(reason)
+                if (reason && reason==='backdropClick' && (seleccion?.id==null || [1,2].includes(acciones.indexOf(accion)))){
+                    return
+                }
+                setSeleccion(null)
+                }} open={abierto} aria-labelledby="customized-dialog-title">
+                    {seleccion?.id==null || [1,2].includes(acciones.indexOf(accion))?<IconButton onClick={()=>{setSeleccion(null)}} sx={(theme)=>({
+                        position:'absolute',right:8,top:8,
+                        width:'fit-content'
+                    })}>
+                        <CloseIcon/>
+                    </IconButton>:null}
+                    {seleccion!=null?<>
+                    {seleccion.id==null || accion==acciones[1] || accion==acciones[2]?<DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+                        {seleccion.id==null?"AÑADIR REGISTRO":accion==acciones[1]?"EDITAR REGISTRO":"ALERTA"}
+                    </DialogTitle>:null}
+                    <DialogContent dividers={seleccion?.id==null || [1,2].includes(acciones.indexOf(accion))}>
+                        {seleccion.id==null || accion==acciones[1]?
+                        <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
+                        :accion==acciones[2]?
+                        <div>
+                        <p>Va a eliminar un registro. Acción irreversible</p>
+                        <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a></div>
+                        :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</div>
+                        }
+                    </DialogContent>
+                    {/* <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [1,2].includes(acciones.indexOf(accion))}/> */}
+                    </>:null}
+            </Dialog>
         </div>
     )
 }

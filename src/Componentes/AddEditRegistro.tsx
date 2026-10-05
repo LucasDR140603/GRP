@@ -124,7 +124,7 @@ export default function({x,editar=false}:Props){
     }
     const error_fechas=end!=null && begin>end
     return <div className="column">
-        <h1 style={{margin:0}}>{editar?"EDITAR":"AÑADIR"} REGISTRO</h1>
+        {/* <h1 style={{margin:0}}>{editar?"EDITAR":"AÑADIR"} REGISTRO</h1> */}
         {selects()}
         <div style={{display:'grid',rowGap:'1rem',columnGap:'1rem',gridTemplateRows:`repeat(${x.fin==null && end!=null?5:4},1fr)`}}>
             <textarea ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} placeholder="Descripción"/>

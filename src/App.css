@@ -163,7 +163,7 @@ a{
   width: fit-content;
   margin:0 auto;
 }
-table{
+table:not(.MuiTable-root){
   margin: 0 auto;
   border-collapse: separate;
   border-spacing: 0;
@@ -175,28 +175,28 @@ table{
 .datos-usuario td:first-child{
   font-weight: bold;
 }
-td,th{
+td:not(.MuiTableCell-root),th:not(.MuiTableCell-root){
   outline:0.25px solid;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   position: relative;
 }
-td{
+td:not(.MuiTableCell-root){
   background-color: #0D1018;
   outline-color: #657272;
 }
-th{
+th:not(.MuiTableCell-root){
   color: black;
   background-color: azure;
   outline-color: black;
 }
-th:not(.bg-aqua):hover{
+th:not(.bg-aqua):not(.MuiTableCell-root):hover{
   background-color: yellow;
 }
-th:active{
+th:not(.MuiTableCell-root):active{
   background-image: linear-gradient(gold,yellow,gold);
 }
-thead{
+thead:not(.MuiTable-root){
   z-index: 1;
   position: sticky;
   top:0
@@ -207,9 +207,9 @@ tfoot{
 }
 tfoot th{
   border-bottom: 1px solid azure;
-  padding: 0;
+  padding: 0 !important;
 }
-thead>tr:first-child>*{
+thead:not(.MuiTableHead-root)>tr:first-child>*{
   text-align: center;
   border-top: 1px solid azure;
 }
@@ -218,15 +218,18 @@ thead td div{
   gap: 1rem;
   justify-content: center;
 }
-tbody>tr:hover>td{
+tbody:not(.MuiTableBody-root)>tr:hover>td{
   background-color: gold;
   color: black;
 }
-tbody>tr:active>td{
+tbody:not(.MuiTableBody-root)>tr:active>td{
   background-color: yellow;
 }
 th>.desplegable{
   min-width: 100%;
+}
+th{
+  font-weight: bolder !important;
 }
 .ventana-emergente,.desplegable{
   z-index: 2;
@@ -257,6 +260,9 @@ th>.desplegable{
     max-height: 100vh;
   }
 }
+.MuiList-root{
+  padding: 0 !important;
+}
 .lista{
   overflow-y: auto;
   overflow-x: hidden;
@@ -266,7 +272,7 @@ th>.desplegable{
 .lista>div,.botones-filtrado{
   padding: 0.25rem;
 }
-.botones-filtrado>a{
+.botones-filtrado a{
   margin: 0.25rem;
   font-size: 0.75rem;
   padding: 0 0.35rem;
@@ -289,10 +295,10 @@ th>.desplegable{
   align-items: center;
   gap: 0.5rem;
 }
-.gold{
+.gold,tr.gold td{
   color: gold;
 }
-.aqua{
+.aqua,tr.aqua td{
   color: aqua;
 }
 .red{
@@ -313,7 +319,20 @@ input::placeholder,textarea::placeholder{
   color: rgb(165, 147, 47);
 }
 textarea:focus,input:not([type='checkbox']):not(.MuiInputBase-input):focus{
-  box-shadow: gold 0px 0px 6px 0px;
+  /* box-shadow: gold 0px 0px 6px 0px; */
+}
+.textarea .MuiFormControl-root{
+  height: 100%;
+}
+.textarea .MuiInputBase-root{
+  padding:0.25rem 0.5rem;
+  height: 100%;
+  overflow-y: auto;
+}
+.textarea textarea:first-of-type{
+  min-height: 100% !important;
+  font-size: small;
+  line-height: normal;
 }
 input[type=checkbox]{
   width: 18px;
@@ -353,7 +372,7 @@ h1{
   margin: 0 auto;
   gap:1rem
 }
-.options>div{
+.options>div:not(.MuiFormControl-root){
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -381,6 +400,7 @@ textarea{
 }
 .banderas{
   padding-bottom: 0 !important;
+  height: 100% !important;
 }
 .banderas ul,.banderas div{
   background-color: black;
@@ -394,4 +414,7 @@ textarea{
   color:azure;
   border-radius: 0px;
   padding-block: 0;
+}
+.MuiSelect-root{
+  width:100%
 }

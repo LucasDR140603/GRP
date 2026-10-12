@@ -80,7 +80,7 @@ export function formatear(fecha:Date,dias:number=0,hora:boolean=false){
     let d=fecha.getDate()+dias
     let m=fecha.getMonth()+1
     let y=fecha.getFullYear()
-    if (d>31 || (d>(bisiesto(y)?29:28) && m==2)){
+    if (d>31 || (d>(bisiesto(y)?29:28) && m==2) || (d>30 && ((m%2==0 && m<8) || (m%2==1 && m>8)))){
         d=1
         m+=1
         if (m>12){

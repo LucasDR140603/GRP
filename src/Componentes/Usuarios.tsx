@@ -2,10 +2,11 @@ import { useData } from "../DataContext.tsx"
 import Perfil from "./Perfil.tsx"
 import api from "../Api.tsx"
 import Close from "./Close.tsx"
-import Checkbox from "./Checkbox.tsx"
 import { useEffect,useState,useRef } from "react"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2"
 import { sin_acentos } from "../Funciones.tsx"
+import {TableContainer,Table,TableHead as Thead,TableBody as Tbody,TableRow as Tr,TableCell as Td,TableSortLabel,Paper,Checkbox,FormControlLabel,TextField,Button,IconButton,Dialog,DialogTitle,DialogContent} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 export default function(){
     const {usuarios,usuario}=useData()
     const columnas=["Perfil","Nick","Nombre","1º Apellido","2º Apellido","Email","Teléfono","Administrador","Operativo"]
@@ -18,15 +19,15 @@ export default function(){
     const [accion,setAccion]=useState("")
     const acciones=["hacer administrador","Dar de ","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef<any>(null)
+    const [abierto,setAbierto]=useState(false)
     useEffect(()=>{
         setAccion("")
         setConfirmacion(false)
         if (seleccion!=null){
-            ventana.current.showModal()
+            setAbierto(true)
         }
         else{
-            ventana.current.close()
+            setAbierto(false)
         }
     },[seleccion])
     const mostrables:any[]=usuarios.filter((x:any)=>{
@@ -117,11 +118,39 @@ export default function(){
         <div className="component">
             <h1>USUARIOS</h1>
             <div className="options">
-                <div><Checkbox val={abiertos} setVal={setAbiertos} title={"Abiertos"}/><Checkbox val={cerrados} setVal={setCerrados} title={"Cerrados"}/></div>
-                <input type="text" placeholder="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}} style={{borderColor:'gold'}}/>
+                <div><FormControlLabel control={<Checkbox/>} checked={abiertos} onChange={(e)=>{setAbiertos(!abiertos)}} label={"Abiertos"}/><FormControlLabel control={<Checkbox/>} checked={cerrados} onChange={(e)=>{setCerrados(!cerrados)}} label={"Cerrados"}/></div>
+                <TextField label="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}}/>
             </div>
             <br/>
-            <div className="table-container">
+            <TableContainer component={Paper} sx={{width:'fit-content',maxWidth:'90%',margin:'0 auto'}}>
+                <Table stickyHeader>
+                    <Thead>
+                        <Tr>
+                            {columnas.map((x,i)=>{
+                                let v=sin_acentos(x.toLowerCase())
+                                if (v.includes("apellido")){
+                                    v=v.split(' ').toReversed().reduce((x:string,y:string)=>x+y).slice(0,-1)
+                                }
+                                return <Td component={'th'} sortDirection={orden==v?sentido==1?'asc':'desc':false}>
+                                    <div style={{display:'flex'}}>
+                                        <TableSortLabel active={orden==v && sentido!=null} direction={sentido==-1?'desc':'asc'} onClick={()=>{
+                                            orden==v?setSentido((sentido==null?1:sentido)*-1):setSentido(1);setOrden(v)
+                                        }}>
+                                            <a onClick={(e)=>{e.stopPropagation();setSentido(1);setOrden((prev)=>{
+                                                return prev==v?null:v
+                                            })}}>{x}</a>
+                                        </TableSortLabel>
+                                    </div>
+                                </Td>
+                            })}
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {ordenados().map((x)=><Tr hover={true} selected={x.id==seleccion?.id} sx={{cursor:'pointer'}} className={x.id==usuario.id?'gold':!x.operativo?'aqua':''} onClick={()=>{setSeleccion(seleccion==null && x.id!=usuario.id?x:null)}}><Td style={{lineHeight:0}}><Perfil usuario={x}/></Td><Td>{x.nick}</Td><Td>{x.nombre}</Td><Td>{x.apellido1}</Td><Td>{x.apellido2}</Td><Td>{x.email}</Td><Td>{x.telefono}</Td><Td>{x.administrador?"Sí":"No"}</Td><Td>{x.operativo?"Sí":"No"}</Td></Tr>)}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            {/* <div className="table-container">
                 <table>
                     <thead>
                         <tr>{columnas.map((x,i)=>{
@@ -144,26 +173,39 @@ export default function(){
                         <tr><th colSpan={columnas.length}></th></tr>
                     </tfoot>
                 </table>
-            </div>
-            <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
+            </div> */}
+            <Dialog open={abierto} onClose={(event,reason)=>{
+                if (reason && reason==='backdropClick' && ([2].includes(acciones.indexOf(accion)))){
+                    return
+                }
+                setSeleccion(null)}} aria-labelledby='customized-dialog-title'>
                 {
                     seleccion!=null?
-                    <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
+                    <>
+                    {[2].includes(acciones.indexOf(accion))?
+                    <DialogTitle sx={{m:0,paddingBlock:0,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'1rem'}} id="customized-dialog-title">
+                        <p>ALERTA</p>
+                        <IconButton onClick={()=>{setSeleccion(null)}} sx={{width:'fit-content'}}>
+                            <CloseIcon/>
+                        </IconButton>
+                    </DialogTitle>
+                    :null}
+                    <DialogContent dividers={[2].includes(acciones.indexOf(accion))}>
                         {accion==acciones[2]?
-                        <div>
-                            <h1 style={{marginBlock:0}}>ALERTA</h1>
+                        <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                             <p>Va a eliminar un usuario y con él sus registros. Acción irreversible</p>
-                            <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
+                            <Button variant='outlined' onClick={()=>{setConfirmacion(true)}}>Confirmar</Button>
                         </div>
-                        :acciones.map((x,i)=>{
+                        :<div style={{display:'flex',gap:'1rem'}}>
+                        {acciones.map((x,i)=>{
                             let texto=(i==0 && seleccion.administrador?"Des":"")+x+(i==1?seleccion.operativo?"baja":"alta":"")
-                            return <a className="btn" onClick={()=>{setAccion(x)}}>{texto.charAt(0).toUpperCase()+texto.slice(1)}</a>
-                        })}
-                        <Close onClick={()=>{setSeleccion(null)}} absolute={accion==acciones[2]}/>
-                    </div>
+                            return <Button variant='outlined' onClick={()=>{setAccion(x)}}>{texto.charAt(0).toUpperCase()+texto.slice(1)}</Button>
+                        })}</div>}
+                    </DialogContent>
+                    </>
                     :null
                 }
-            </dialog>
+            </Dialog>
         </div>
     )
 }

@@ -73,11 +73,11 @@ function App() {
                     },
                     paper:{
                       sx:{
-                        marginTop:'1rem'
+                        marginTop:'1rem',
                       }
                     }
                   }} anchorEl={anchorEl} open={open} onClose={()=>{setAnchorEl(null)}}>
-                <MenuItem><Link to={ulr_datos_usuario}>Datos de Usuario</Link></MenuItem>
+                <MenuItem onClick={(e)=>{setAnchorEl(null);}}><Link to={ulr_datos_usuario}>Datos de Usuario</Link></MenuItem>
                 <MenuItem onClick={(e)=>{setAnchorEl(null);logout()}}>Cerrar Sesión</MenuItem>
               </Menu>
                 {/* {options && 

@@ -103,7 +103,7 @@ export default function(){
                 {campos.map((x,i)=>{
                     return <div style={{display:'flex',gap:'0.25rem',alignItems:'center',width:'100%'}}>
                         {i==7?<ReactFlagsSelect className="banderas" searchable={true} selected={pais} onSelect={setPais}/>:null}
-                        <Input ref={(el:any)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={(e)=>{sets[i](e.target.value)}} label={labels[i]}/>
+                        <Input ref={(el:any)=>(inputRefs.current[i]=el)} style={{width:'100%',height:'100%'}} type={[4,5,8].includes(i)?"password":i==7?"tel":"text"} error={(i==5 && clave!=clave_repe) || (error && ((mensaje.includes("repetidos")) || (i==4 && (!comprobar(clave) || mensaje.includes("Contraseña"))) || (i==8 && clave_registro!=process.env.REACT_APP_REGISTER_KEY)))} value={x} onChange={(e)=>{sets[i](e)}} label={labels[i]}/>
                     </div>
                 })}
                 <Button variant="outlined" onClick={()=>{registrar()}}>Registrar</Button>

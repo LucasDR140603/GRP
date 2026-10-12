@@ -1,9 +1,8 @@
-import { format, formatDate, parse } from "date-fns";
+import { formatDate, parse } from "date-fns";
 import { useData } from "../DataContext.tsx";
 import { useEffect, useRef, useState } from "react";
-import Checkbox from "./Checkbox.tsx";
 import api from "../Api.tsx";
-import { json } from "node:stream/consumers";
+import {Button,TextField,Select,MenuItem,Checkbox,FormControlLabel} from '@mui/material'
 interface Props{
     x:Record<string,any>
     editar:boolean
@@ -81,21 +80,21 @@ export default function({x,editar=false}:Props){
             setProyecto(proyectos_abiertos.find((y:any)=>y.id_centro==centro.id))
         }
         return <>
-            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
+            <Select value={cliente.id} onChange={(e)=>{setCliente(clientes_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
             {clientes_con_proyecto.map((y:any)=>{
-                return <option value={y.id}>{y.nombre}</option>
+                return <MenuItem value={y.id}>{y.nombre}</MenuItem>
             })}
-            </select>
-            <select value={centro.id} onChange={(e)=>{setCentro(centros_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
+            </Select>
+            <Select value={centro.id} onChange={(e)=>{setCentro(centros_con_proyecto.find((y:any)=>y.id==e.target.value))}}>
             {centros_con_proyecto.filter((y:any)=>y.id_cliente==cliente.id).map((y:any)=>{
-                return <option value={y.id}>{y.nombre}</option>
+                return <MenuItem value={y.id}>{y.nombre}</MenuItem>
             })}
-            </select>
-            <select value={proyecto.id} onChange={(e)=>{setProyecto(proyectos_abiertos.find((y:any)=>y.id==e.target.value))}}>
+            </Select>
+            <Select value={proyecto.id} onChange={(e)=>{setProyecto(proyectos_abiertos.find((y:any)=>y.id==e.target.value))}}>
             {proyectos_abiertos.filter((y:any)=>y.id_centro==centro.id).map((y:any)=>{
-                return <option value={y.id}>{y.nombre}</option>
+                return <MenuItem value={y.id}>{y.nombre}</MenuItem>
             })}
-            </select>
+            </Select>
         </>
     }
     useEffect(()=>{
@@ -103,7 +102,7 @@ export default function({x,editar=false}:Props){
         const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 if(![descRef.current,obsRef.current].includes(document.activeElement)){
-                    enviar()
+                    // enviar()
                 }
             }
         }
@@ -124,22 +123,18 @@ export default function({x,editar=false}:Props){
     }
     const error_fechas=end!=null && begin>end
     return <div className="column">
-        {/* <h1 style={{margin:0}}>{editar?"EDITAR":"AÑADIR"} REGISTRO</h1> */}
         {selects()}
         <div style={{display:'grid',rowGap:'1rem',columnGap:'1rem',gridTemplateRows:`repeat(${x.fin==null && end!=null?5:4},1fr)`}}>
-            <textarea ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} placeholder="Descripción"/>
-            <textarea ref={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} placeholder="Observaciones"/>
-            <input style={error_fechas?{borderColor:'red'}:{}} type="datetime-local" onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
-            {x.id==null || x.fin==null?<div style={{display:'flex',gap:'0.5rem',gridRow:4,alignItems:'center'}}><input type="checkbox" id={"terminado"} onChange={(e)=>{setEnd(end!=null?null:begin)}}/><label htmlFor='terminado'>Terminado</label></div>:null}
-            {end!=null?<input style={{gridColumn:'1',gridRow:x.fin==null?5:4,...(error_fechas?{borderColor:'red'}:{})}} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
+            <TextField className='textarea' multiline={true} maxRows={2} ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
+            <TextField className='textarea' multiline={true} maxRows={2} ref={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} label="Observaciones"/>
+            <TextField type="datetime-local" error={error_fechas} onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
+            {x.id==null || x.fin==null?<FormControlLabel control={<Checkbox/>} label="Terminado" onChange={(e)=>{setEnd(end!=null?null:begin)}}/>:null}
+            {end!=null?<TextField style={{gridColumn:'1',gridRow:x.fin==null?5:4}} error={error_fechas} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
             {campos_gasto.map((y,i)=>{
-                return <div style={{gridColumn:'2',gridRow:(i+1)}}>
-                    <label>{labels_gasto[i]}: {y}</label>
-                    <input type="number" value={y} onChange={(e)=>{let v=parseFloat(e.target.value) || 0;sets_gasto[i](v<0?0:v)}}/>
-                </div>
+                return <TextField style={{gridColumn:'2',gridRow:(i+1)}} label={labels_gasto[i]+": "+y} type='number' value={y} onChange={(e)=>{let v=parseFloat(e.target.value) || 0;sets_gasto[i](v<0?0:v)}}/>
             })}
         </div>
-        <a className="btn" onClick={enviar}>Confirmar</a>
+        <Button variant='outlined' onClick={enviar}>Confirmar</Button>
         {acierto?<p className="aqua" style={{marginBlock:0}}>Registro {editar?"editado":"añadido"} con éxito</p>:null}
         {error?<p className="red" style={{marginBlock:0}}>ERROR{error_fechas?": La fecha de inicio no debe ser mayor a la de fin.":""}</p>:null}
     </div>

@@ -1,3 +1,4 @@
+import {Button} from '@mui/material'
 export type item=Record<"id" | "label" | "checked" | "visible",any>
 interface Props{
     lista:item[]
@@ -18,18 +19,18 @@ export default function({lista,set}:Props){
                             })}
                 </div>
                 <div className="botones-filtrado">
-                    <a className="btn" onClick={()=>{set((prev: item[])=>{
+                    <Button variant='outlined' style={{borderRadius:'50px'}} onClick={()=>{set((prev: item[])=>{
                         return prev.map((z)=>{
                             z.checked=!z.checked && z.visible
                             return z
                         })
-                    })}}>Invertir</a>
-                    <a className="btn" onClick={()=>{set((prev: item[])=>{
+                    })}}>Invertir</Button>
+                    <Button variant='outlined' style={{borderRadius:'50px'}} onClick={()=>{set((prev: item[])=>{
                         return prev.map((z)=>{
                             z.checked=true && z.visible
                             return z
                         })
-                    })}}>Todos</a>
+                    })}}>Todos</Button>
                 </div>
             </div>
 }

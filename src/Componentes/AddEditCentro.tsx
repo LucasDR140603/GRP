@@ -1,7 +1,7 @@
 import { useData } from "../DataContext.tsx";
 import { useEffect, useState } from "react";
-import Checkbox from "./Checkbox.tsx";
 import api from "../Api.tsx";
+import {Checkbox,FormControlLabel,Select,MenuItem,TextField,Button} from '@mui/material'
 interface Props{
     x:Record<string,any>
     editar:boolean
@@ -18,11 +18,11 @@ export default function({x,editar=false}:Props){
             setCliente(clientes_abiertos[0])
         }
         return <>
-            <select value={cliente.id} onChange={(e)=>{setCliente(clientes_abiertos.find((y:Record<string,any>)=>y.id==e.target.value))}}>
+            <Select value={cliente.id} onChange={(e)=>{setCliente(clientes_abiertos.find((y:Record<string,any>)=>y.id==e.target.value))}}>
             {clientes_abiertos.map((y:Record<string,any>)=>{
-                return <option value={y.id}>{y.nombre}</option>
+                return <MenuItem value={y.id}>{y.nombre}</MenuItem>
             })}
-            </select>
+            </Select>
         </>
     }
     useEffect(()=>{
@@ -52,11 +52,10 @@ export default function({x,editar=false}:Props){
     }
     return (
         <div className="column">
-            <h1 style={{marginBottom:0}}>{editar?"EDITAR":"AÑADIR"} CENTRO</h1>
             {selects()}
-            <input type="text" className={error?"red":''} placeholder="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%',border:error?'1px solid red':''}}/>
-            {x.id!=null?<Checkbox val={abierto} title={"Abierto"} setVal={setAbierto}/>:null}
-            <a className="btn" onClick={enviar}>Confirmar</a>
+            <TextField error={error} label="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%'}}/>
+            {x.id!=null?<FormControlLabel control={<Checkbox/>} checked={abierto} label='Abierto' onChange={(e)=>{setAbierto(!abierto)}}/>:null}
+            <Button variant='outlined' onClick={enviar}>Confirmar</Button>
             {acierto || error?<p className={error?"red":"aqua"} style={{marginBlock:0}}>{acierto?`Centro ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</p>:null}
         </div>
     )

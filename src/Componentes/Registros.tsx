@@ -2,7 +2,6 @@ import { useData } from "../DataContext.tsx";
 import { useEffect,useMemo,useState,useRef } from "react";
 import { fechaSQL, inicio2000,actual, sumDias, formatear, sin_acentos, toExcel, inicio_mes_actual } from "../Funciones.tsx";
 import Filtro,{item} from "./Filtro.tsx";
-import Checkbox from "./Checkbox.tsx"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2";
 import { RxTriangleLeft,RxTriangleRight } from "react-icons/rx";
 import { ImArrowLeft,ImArrowRight } from "react-icons/im";
@@ -11,14 +10,11 @@ import Close from "./Close.tsx";
 import AddEditRegistro from "./AddEditRegistro.tsx";
 import api from "../Api.tsx";
 import { MaterialReactTable, MRT_TableHeadCellFilterLabel, MRT_TableHeadCellSortLabel, useMaterialReactTable } from "material-react-table";
-import { Box, Button } from "@mui/material";
-import MenuItem from '@mui/material/MenuItem'
-import Menu from '@mui/material/Menu'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import IconButton from '@mui/material/IconButton'
+import {Menu,Button,Dialog,DialogTitle,DialogContent,IconButton,TextField,FormControlLabel,Checkbox,TableContainer,Paper,Table,TableHead as Thead,TableBody as Tbody,TableRow as Tr,TableCell as Td,TableSortLabel} from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close'
+import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt'
+import FilterListIcon from '@mui/icons-material/FilterList'
+import FiltroMenu from './FiltroMenu.tsx'
 export default function(){
     const [open,setOpen]=useState(-1)
     const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
@@ -33,8 +29,10 @@ export default function(){
     const [accion,setAccion]=useState("")
     const acciones=["Terminar","Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef<any>(null)
+    // const ventana=useRef<any>(null)
     const [abierto,setAbierto]=useState<boolean>(false)
+    const [anchorEl,setAnchorEl]=useState<Element | null>(null)
+    const menu_abierto=Boolean(anchorEl)
     const f:item[][]=[clientes,centros,proyectos,usuarios].map((x,i)=>{
         return x.filter((y:any)=>{
                     let campo=i==2?'fin':i==3?'operativo':'abierto'
@@ -95,11 +93,11 @@ export default function(){
                     if (array.length>0){
                         campo=array[array.length-1]
                     }
-                    let duracion=orden==columnas[columnas.length-1].toLowerCase()
+                    let duracion=orden==sin_acentos(columnas[columnas.length-1]).toLowerCase()
                     function format(o:any){
                         let valor=duracion?o.fin==null?0:o.duracion:o[campo || "inicio"]
                         let defecto=duracion?0:"1"
-                        let campos_fecha=['día','hora']
+                        let campos_fecha=['dia','hora']
                         if (["inicio","fin",null].includes(campo)){
                             valor=fechaSQL(valor)
                             if (array.length>0 && campos_fecha.includes(array[0])){
@@ -196,40 +194,7 @@ export default function(){
             window.removeEventListener('keydown',handleKeyDown)
         }
     },[accion])
-    // const opciones=()=>{
-    //     if (seleccion!=null && seleccion.id!=null && mostrables.find((x)=>x.id==seleccion.id)==null){
-    //         setSeleccion(null)
-    //     }
-    //     return seleccion!=null?
-    //         <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
-    //             {seleccion.id==null || accion==acciones[1]?
-    //             <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
-    //             :
-    //             <>{acciones.map((x,i)=>(registros.filter((y)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
-    //             }
-    //             <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || accion==acciones[1]}/>
-    //         </div>
-    //         :null
-    // }
-    const confirmar=()=>{
-        return accion==acciones[2]?
-        <div className="ventana-emergente">
-            <Close onClick={()=>{setAccion("")}} absolute={true}/>
-            <h1 style={{marginBlock:0}}>ALERTA</h1>
-            <p>Va a eliminar un registro. Acción irreversible</p>
-            <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
-        </div>
-        :null
-    }
     const duracion_total=mostrables.filter((x)=>x.fin!=null).reduce((x,y)=>x+y.duracion,0.0).toFixed(1)
-    // const columns=useMemo(
-    //     ()=>columnas.map((x)=>{
-    //         return {
-    //             accessorKey:x.toLocaleLowerCase(),
-    //             header: x,
-    //         }
-    //     })
-    // )
     return (
         <div className="component">
             <div className="btnbox">
@@ -307,23 +272,77 @@ export default function(){
                 :null}
             </div>
             <h1>REGISTROS</h1>
+            {/* <DatePicker label="Desde" onChange={(newValue)=>{alert(newValue)}}/> */}
             <div className="options">
                 <div>
-                    <RxTriangleLeft style={{cursor:'pointer'}} size={25} onClick={()=>{cambiarDia(-1)}}/>
-                    <input type="date" onChange={ChangeBegin} value={format(begin,'yyyy-MM-dd')}/>
+                    <IconButton onClick={()=>{cambiarDia(-1)}}>
+                        <RxTriangleLeft style={{cursor:'pointer'}} size={25}/>
+                    </IconButton>
+                    <TextField type="date" onChange={ChangeBegin} value={format(begin,'yyyy-MM-dd')}/>
                     <div style={{display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
-                        <ImArrowRight onClick={()=>{setEnd(begin)}} cursor={'pointer'}/>
-                        <ImArrowLeft onClick={()=>{setBegin(end)}} cursor={'pointer'}/>
+                        <ArrowRightAlt onClick={()=>{setEnd(begin)}} cursor={'pointer'}/>
+                        <ArrowRightAlt style={{transform:'rotate(-180deg)'}} onClick={()=>{setBegin(end)}} cursor={'pointer'}/>
                     </div>
-                    <input type="date" onChange={ChangeEnd} value={format(end,'yyyy-MM-dd')}/>
-                    <RxTriangleRight style={{cursor:'pointer'}} size={25} onClick={()=>{cambiarDia(1)}}/>
+                    <TextField type="date" onChange={ChangeEnd} value={format(end,'yyyy-MM-dd')}/>
+                    <IconButton onClick={()=>{cambiarDia(1)}}>
+                        <RxTriangleRight style={{cursor:'pointer'}} size={25}/>
+                    </IconButton>
                 </div>
-                <div><Checkbox val={terminados} setVal={setTerminados} title={"Terminados"}/><Checkbox val={enCurso} setVal={setEnCurso} title={"En Curso"}/></div>
-                <input type="text" placeholder="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}} style={{borderColor:'gold'}}/>
+                <div><FormControlLabel control={<Checkbox defaultChecked/>} label="Terminados" onChange={(e)=>{setTerminados(!terminados)}}/><FormControlLabel control={<Checkbox defaultChecked/>} label="En Curso" value={enCurso} onChange={(e)=>{setEnCurso(!enCurso)}}/></div>
+                <TextField type='text' label={"Buscar"} value={busqueda} onChange={(e)=>{setBusqueda(e.target.value)}}/>
             </div>
             <br/>
             {
-            <div className="table-container">
+            <>
+            <TableContainer sx={{width:'fit-content',maxWidth: '90%',margin:'0 auto'}} component={Paper}>
+                <Table stickyHeader>
+                    <Thead>
+                        <Tr>{columnas.map((x,i)=>{
+                            let v=sin_acentos(x.toLowerCase())
+                            let nc=filtros.length>0 && filtros[i]!=null && filtros[i].length>0 && filtros[i].filter((y)=>!y.checked && y.visible).length>0
+                            return <Td component='th' sortDirection={orden==v?sentido==1?'asc':'desc':false}>
+                                <div style={{display:'flex'}}>
+                                    <TableSortLabel active={orden==v && sentido!=null} direction={sentido==-1?'desc':'asc'} onClick={()=>{
+                                        orden==v?setSentido((sentido==null?1:sentido)*-1):setSentido(1);setOrden(v)
+                                    }}>
+                                        <a onClick={(e)=>{e.stopPropagation();setSentido(1);setOrden((prev)=>{
+                                            return prev==v?null:v
+                                        })}}>{x}{i==columnas.length-1?": "+duracion_total:null}</a>
+                                    </TableSortLabel>
+                                    {i<4?
+                                    <IconButton style={{width:'25px',height:'25px'}} size="small" aria-haspopup="true" aria-controls={"menu_proyectos"} id={"button_"+i} aria-expanded={open==i} onClick={(e)=>{setOpen(i);setAnchorEl(e.currentTarget)}}>
+                                        <FilterListIcon style={{color:nc?'gold':'azure',scale:0.75}}/>
+                                    </IconButton>
+                                    :null}
+                                </div>
+                            </Td>
+                        })}
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {ordenados().map((x)=>{
+                            let terminado=x.fin!=null
+                            let campos_inicio=x.inicio.split(' ')
+                            let campos_fin=terminado?x.fin.split(' '):'En Curso'
+                        return <Tr hover={true} sx={{cursor:'pointer'}} selected={x.id==seleccion?.id} className={terminado?'':'gold'} onClick={()=>{setSeleccion(seleccion!=null?null:x)}}><Td>{x.cliente}</Td><Td>{x.centro}</Td><Td>{x.proyecto}</Td><Td>{x.usuario}</Td><Td>{campos_inicio[0]}</Td><Td>{campos_inicio[1]}</Td>{!terminado?<Td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</Td>:<><Td>{campos_fin[0]}</Td><Td>{campos_fin[1]}</Td></>}<Td>{x.descripcion}</Td><Td>{x.observaciones}</Td><Td>{x.duracion??'En Curso'}</Td></Tr>
+                        })}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            <Menu id={"menu_centros"} open={menu_abierto && open!=-1} anchorEl={anchorEl!} onClose={()=>{setAnchorEl(null)}} slotProps={{
+                    list:{
+                        "aria-labelledby":"button_"+open
+                    },
+                    paper:{
+                        sx:{
+                            marginTop:'1rem',
+                            maxHeight:'200px',
+                        }
+                    }
+                }}>
+                <FiltroMenu lista={filtros[open]} set={setsFiltros[open]}/>
+            </Menu>
+            {/* <div className="table-container">
                 <table>
                     <thead>
                         <tr>{columnas.map((x,i)=>{
@@ -354,48 +373,32 @@ export default function(){
                         <tr><th colSpan={columnas.length}></th></tr>
                     </tfoot>
                 </table>
-            </div>}
-            {/* <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
-                {seleccion!=null?<div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
-                {seleccion.id==null || accion==acciones[1]?
-                <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
-                :accion==acciones[2]?
-                <div><h1 style={{marginBlock:0}}>ALERTA</h1>
-                <p>Va a eliminar un registro. Acción irreversible</p>
-                <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a></div>
-                :<>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
-                }
-                <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [1,2].includes(acciones.indexOf(accion))}/>
-                </div>:null}
-            </dialog> */}
-            <Dialog onClose={(event,reason)=>{
-                // alert(reason)
-                if (reason && reason==='backdropClick' && (seleccion?.id==null || [1,2].includes(acciones.indexOf(accion)))){
+            </div> */}
+            </>}
+            <Dialog sx={{color:'#121212'}} onClose={(event,reason)=>{
+                if (reason && reason==='backdropClick' && (seleccion?.id==null || [1].includes(acciones.indexOf(accion)))){
                     return
                 }
-                setSeleccion(null)
-                }} open={abierto} aria-labelledby="customized-dialog-title">
-                    {seleccion?.id==null || [1,2].includes(acciones.indexOf(accion))?<IconButton onClick={()=>{setSeleccion(null)}} sx={(theme)=>({
-                        position:'absolute',right:8,top:8,
-                        width:'fit-content'
-                    })}>
-                        <CloseIcon/>
-                    </IconButton>:null}
+                setSeleccion(null)}} open={abierto} aria-labelledby="customized-dialog-title">
                     {seleccion!=null?<>
-                    {seleccion.id==null || accion==acciones[1] || accion==acciones[2]?<DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                        {seleccion.id==null?"AÑADIR REGISTRO":accion==acciones[1]?"EDITAR REGISTRO":"ALERTA"}
+                    {seleccion.id==null || [1,2].includes(acciones.indexOf(accion))?
+                    <DialogTitle sx={{m:0,paddingBlock:0,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'1rem'}} id="customized-dialog-title">
+                        <p>{seleccion.id==null?"AÑADIR REGISTRO":accion==acciones[1]?"EDITAR REGISTRO":"ALERTA"}</p>
+                        <IconButton onClick={()=>{setSeleccion(null)}} sx={{width:'fit-content'}}>
+                            <CloseIcon/>
+                        </IconButton>
                     </DialogTitle>:null}
                     <DialogContent dividers={seleccion?.id==null || [1,2].includes(acciones.indexOf(accion))}>
                         {seleccion.id==null || accion==acciones[1]?
                         <AddEditRegistro x={seleccion.id==null?seleccion:registros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[1]}/>
                         :accion==acciones[2]?
-                        <div>
+                        <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                         <p>Va a eliminar un registro. Acción irreversible</p>
-                        <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a></div>
-                        :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</div>
+                        <Button variant='outlined' onClick={()=>{setConfirmacion(true)}}>Confirmar</Button>
+                        </div>
+                        :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
                         }
                     </DialogContent>
-                    {/* <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [1,2].includes(acciones.indexOf(accion))}/> */}
                     </>:null}
             </Dialog>
         </div>

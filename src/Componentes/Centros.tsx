@@ -1,12 +1,14 @@
 import { useData } from "../DataContext.tsx"
 import api from "../Api.tsx"
 import Close from "./Close.tsx"
-import Checkbox from "./Checkbox.tsx"
 import { useEffect,useState,useRef } from "react"
-import Filtro from "./Filtro.tsx"
 import { HiArrowLongDown,HiArrowLongUp } from "react-icons/hi2"
 import { sin_acentos } from "../Funciones.tsx"
 import AddEditCentro from "./AddEditCentro.tsx"
+import {Menu,Button,IconButton,Dialog,DialogTitle,DialogContent,TextField,Checkbox,FormControlLabel,Paper,TableContainer,Table,TableHead as Thead,TableBody as Tbody,TableRow as Tr,TableCell as Td,TableSortLabel} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import FilterListIcon from '@mui/icons-material/FilterList'
+import FiltroMenu from "./FiltroMenu.tsx"
 export default function(){
     const [open,setOpen]=useState(-1)
     const {clientes,centros,getClienteByCentro,usuario}=useData()
@@ -19,15 +21,20 @@ export default function(){
     const [accion,setAccion]=useState("")
     const acciones=["Editar","Eliminar"]
     const [confirmacion,setConfirmacion]=useState(false)
-    const ventana=useRef<any>(null)
+    const [abierto,setAbierto]=useState(false)
+    const [anchorEl,setAnchorEl]=useState<Element | null>(null)
+    const menu_abierto=Boolean(anchorEl)
+    // const ventana=useRef<any>(null)
     useEffect(()=>{
         setAccion("")
         setConfirmacion(false)
         if (seleccion!=null){
-            ventana.current.showModal()
+            // ventana.current.showModal()
+            setAbierto(true)
         }
         else{
-            ventana.current.close()
+            // ventana.current.close()
+            setAbierto(false)
         }
     },[seleccion])
     const [cli,setCli]=useState(clientes.map((x:any)=>{
@@ -115,21 +122,70 @@ export default function(){
         <div className="component">
             {usuario.administrador?
             <div className="btnbox">
-                <a className="btn" onClick={()=>{
+                <Button variant='outlined' onClick={()=>{
                     setSeleccion(seleccion==null?()=>{
                         let ultimo={nombre:"",id_cliente:centros[0].id_cliente,abierto:true}
                         return ultimo
                     }:null)
-                }}>Añadir</a>
+                }}>Añadir</Button>
             </div>
             :null}
             <h1>CENTROS</h1>
             <div className="options">
-                <div><Checkbox val={abiertos} setVal={setAbiertos} title={"Abiertos"}/><Checkbox val={cerrados} setVal={setCerrados} title={"Cerrados"}/></div>
-                <input type="text" placeholder="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}} style={{borderColor:'gold'}}/>
+                <div><FormControlLabel label='Abiertos' checked={abiertos} control={<Checkbox/>} onChange={(e)=>{setAbiertos(!abiertos)}}/><FormControlLabel label='Cerrados' checked={cerrados} control={<Checkbox/>} onChange={(e)=>{setCerrados(!cerrados)}}/></div>
+                <TextField label="Buscar..." onChange={(e)=>{setBusqueda(e.target.value)}}/>
             </div>
             <br/>
-            <div className="table-container">
+            <TableContainer sx={{width:'fit-content',maxWidth: '90%',margin:'0 auto'}} component={Paper}>
+                <Table stickyHeader>
+                    <Thead>
+                        <Tr>{columnas.map((x,i)=>{
+                            let v=sin_acentos(x.toLowerCase())
+                            let nc=i==0 && cli!=null && cli.length>0 && cli.filter((y:any)=>!y.checked && y.visible).length>0
+                            return <Td component='th' sortDirection={orden==v?sentido==1?'asc':'desc':false}>
+                                <TableSortLabel active={orden==v && sentido!=null} direction={sentido==-1?'desc':'asc'} onClick={()=>{
+                                    orden==v?setSentido((sentido==null?1:sentido)*-1):setSentido(1);setOrden(v)
+                                }}>
+                                    <a onClick={(e)=>{e.stopPropagation();setSentido(1);setOrden((prev)=>{
+                                        return prev==v?null:v
+                                    })}}>{x}</a>
+                                </TableSortLabel>
+                                {i==0?
+                                    <IconButton aria-haspopup="true" aria-controls={"menu_centros"} id={"button_"+i} aria-expanded={open==i} onClick={(e)=>{setOpen(i);setAnchorEl(e.currentTarget)}}>
+                                        <FilterListIcon style={{color:nc?'gold':'azure'}}/>
+                                    </IconButton>
+                                :null}
+                                {/* {open==i?
+                                    <Filtro lista={cli} set={setCli}/>
+                                :null} */}
+                                </Td>
+                            })}
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {ordenados().map((x)=>{
+                            return <Tr sx={{cursor:'pointer'}} hover={true} selected={x.id==seleccion?.id} className={!x.abierto?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><Td>{getClienteByCentro.current(x).nombre}</Td><Td>{x.nombre}</Td><Td>{x.abierto?"Abierto":"Cerrado"}</Td></Tr>
+                        })}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            <Menu id={"menu_centros"} open={menu_abierto && open!=-1} anchorEl={anchorEl!} onClose={()=>{setAnchorEl(null)}} slotProps={{
+                list:{
+                    "aria-labelledby":"button_"+open
+                },
+                paper:{
+                    sx:{
+                        marginTop:'1rem',
+                        maxHeight:'200px',
+                    }
+                }
+            }}>
+                <FiltroMenu lista={cli} set={setCli}/>
+                {/* <MenuItem sx={{height:'150px',width:'fit-content'}}>
+                    <Filtro lista={cli} set={setCli}/>
+                </MenuItem> */}
+            </Menu>
+            {/* <div className="table-container">
                 <table>
                     <thead>
                         <tr>{columnas.map((x,i)=>{
@@ -158,27 +214,39 @@ export default function(){
                         <tr><th colSpan={columnas.length}></th></tr>
                     </tfoot>
                 </table>
-            </div>
-            <dialog ref={ventana} onClose={()=>{setSeleccion(null)}}>
+            </div> */}
+            <Dialog onClose={(event,reason)=>{
+                if (reason && reason==='backdropClick' && (seleccion?.id==null || [0,1].includes(acciones.indexOf(accion)))){
+                    return
+                }
+                setSeleccion(null)}} open={abierto} aria-labelledby="customized-dialog-title">
                 {
                     seleccion!=null?
-                    <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
+                    <>
+                        {seleccion.id==null || [0,1].includes(acciones.indexOf(accion))?
+                        <DialogTitle id='customized-dialog-title' sx={{m:0,paddingBlock:0,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'1rem'}}>
+                            <p>{seleccion.id==null?"AÑADIR CENTRO":accion==acciones[0]?"EDITAR CENTRO":"ALERTA"}</p>
+                            <IconButton onClick={()=>{setSeleccion(null)}} sx={{width:'fit-content'}}>
+                                <CloseIcon/>
+                            </IconButton>
+                        </DialogTitle>
+                        :null}
+                        <DialogContent dividers={seleccion?.id==null || [0,1].includes(acciones.indexOf(accion))}>
                         {seleccion.id==null || accion==acciones[0]?
                         <AddEditCentro x={seleccion.id==null?seleccion:centros.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
                         :accion==acciones[1]?
-                        <div>
-                            <h1 style={{marginBlock:0}}>ALERTA</h1>
+                        <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                             <p>Va a eliminar un centro y con él sus proyectos y registros. Acción irreversible</p>
-                            <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
+                            <Button variant='outlined' onClick={()=>{setConfirmacion(true)}}>Confirmar</Button>
                         </div>
                         :
-                        <>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
+                        <div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=><Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
                         }
-                        <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || [0,1].includes(acciones.indexOf(accion))}/>
-                    </div>
+                        </DialogContent>
+                    </>
                     :null
                 }
-            </dialog>
+            </Dialog>
         </div>
     )
 }

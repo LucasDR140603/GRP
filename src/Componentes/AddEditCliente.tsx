@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Checkbox from "./Checkbox.tsx";
 import api from "../Api.tsx";
+import {Button,Checkbox,FormControlLabel,TextField} from '@mui/material'
 interface Props{
     x:Record<string,any>
     editar:boolean
@@ -37,10 +37,9 @@ export default function({x,editar=false}:Props){
     }
     return (
         <div className="column">
-            <h1 style={{marginBottom:0}}>{editar?"EDITAR":"AÑADIR"} CLIENTE</h1>
-            <input type="text" className={error?"red":''} placeholder="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%',border:error?'1px solid red':''}}/>
-            {x.id!=null?<Checkbox val={abierto} title={"Abierto"} title2="" setVal={setAbierto}/>:null}
-            <a className="btn" onClick={enviar}>Confirmar</a>
+            <TextField error={error} label="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%'}}/>
+            {x.id!=null?<FormControlLabel control={<Checkbox/>} checked={abierto} label={"Abierto"} onChange={(e)=>{setAbierto(!abierto)}}/>:null}
+            <Button variant="outlined" onClick={enviar}>Confirmar</Button>
             {acierto || error?<p className={error?"red":"aqua"} style={{marginBlock:0}}>{acierto?`Cliente ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</p>:null}
         </div>
     )

@@ -3,14 +3,13 @@ import { useState,useEffect, useRef } from "react";
 import { useData } from "../DataContext.tsx";
 import Input from "./Input.tsx";
 import Cookies from 'js-cookie'
-import Close from "./Close.tsx";
 import { ThreeDots } from "react-loader-spinner";
 import api from "../Api.tsx";
 import { comprobar } from "../Funciones.tsx";
 import {useTimer} from 'react-timer-hook'
 import Turnstile from "react-turnstile";
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
+import {TextField,Dialog,DialogTitle,DialogContent,IconButton,Button} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 export default function(){
     const {init}=useData()
     const [user,setUser]=useState("")
@@ -26,7 +25,8 @@ export default function(){
     const [codigo_correcto,setCodigoCorrecto]=useState(false)
     const [cargando,setCargando]=useState(false)
     const inputRefs=useRef<any>([])
-    const ventana=useRef<any>(null)
+    const [abierto,setAbierto]=useState(false)
+    // const ventana=useRef<any>(null)
     const tiempo=()=>{
         const t=new Date();
         t.setSeconds(t.getSeconds()+900);
@@ -88,10 +88,12 @@ export default function(){
     },[user,clave,clave_repe,recuperar,encontrado,codigo_correcto,token,codigo])
     useEffect(()=>{
         if (recuperar){
-            ventana.current.showModal()
+            // ventana.current.showModal()
+            // setAbierto(true)
         }
         else{
-            ventana.current.close()
+            // ventana.current.close()
+            // setAbierto(false)
         }
         restart(tiempo())
         setEncontrado(false)
@@ -162,31 +164,42 @@ export default function(){
             </div>
             <div>
             </div>
-            <dialog ref={ventana} onClose={()=>{setRecuperar(false)}}>
-                <Close onClick={()=>{setRecuperar(false)}} absolute={true}/>
-                <div className="column">
-                    {!encontrado?
-                    <>
-                        <h1>RECUPERAR CUENTA</h1>
-                        <input className={error?"error":""} type="text" onChange={(e)=>{setError(false);setUser(e.target.value)}} placeholder="Nick o Email"/>
-                        <a className="btn" onClick={buscar}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Buscando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Buscar Usuario"}</a>
-                    </>
-                    :!codigo_correcto?
-                    <>
-                        <h1 style={{marginBottom:0,marginTop:'3rem',lineHeight:0}}>CÓDIGO DE RECUPERACIÓN</h1>
-                        <h1 style={{lineHeight:0,marginBottom:'0.5rem'}}>{minutes.toString().padStart(2,'0')}:{seconds.toString().padStart(2,'0')}</h1>
-                        <input className={error?"error":""} value={codigo} type="text" maxLength={4} onChange={(e)=>{setError(false);setCodigo(e.target.value)}} placeholder="Código de Recuperación"/>
-                        <a className="btn" onClick={verificar_codigo}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Comprobando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Enviar"}</a>
-                    </>
-                    :<>
-                        <h1>CAMBIAR CONTRASEÑA</h1>
-                        <Input type="password" onChange={setClave} className={error?"red":""} label="Contraseña Nueva"/>
-                        <Input type="password" onChange={setClaveRepe} className={error?"red":""} label="Repetir Contraseña"/>
-                        <a className="btn" onClick={cambiar}>Enviar</a>
-                    </>}
-                    {error?<p className="red">{mensaje}</p>:""}
-                </div>
-            </dialog>
+            <Dialog open={recuperar} onClose={(event,reason)=>{
+                if (reason && reason=='backdropClick'){
+                    return;
+                }
+                setRecuperar(false)}} aria-labelledby="customized-dialog-title">
+                <DialogTitle sx={{m:0,paddingBlock:0,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'1rem'}} id='customized-dialog-title'>
+                    <p>{!encontrado?"RECUPERAR CUENTA":!codigo_correcto?"CÓDIGO DE RECUPERACIÓN":"CAMBIAR CONTRASEÑA"}</p>
+                    <IconButton onClick={(e)=>{setRecuperar(false)}} sx={{width:'fit-content'}}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent dividers={true}>
+                    <div className="column">
+                        {!encontrado?
+                        <>
+                            {/* <h1>RECUPERAR CUENTA</h1> */}
+                            <TextField error={error} onChange={(e)=>{setError(false);setUser(e.target.value)}} label="Nick o Email"/>
+                            <Button variant='outlined' onClick={buscar}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Buscando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Buscar Usuario"}</Button>
+                        </>
+                        :!codigo_correcto?
+                        <>
+                            {/* <h1 style={{marginBottom:0,marginTop:'3rem',lineHeight:0}}>CÓDIGO DE RECUPERACIÓN</h1> */}
+                            <h1 style={{lineHeight:0,marginBottom:'0.5rem'}}>{minutes.toString().padStart(2,'0')}:{seconds.toString().padStart(2,'0')}</h1>
+                            <TextField error={error} value={codigo} type="text" onChange={(e)=>{setError(false);setCodigo(e.target.value)}} label="Código de Recuperación"/>
+                            <Button variant='outlined' onClick={verificar_codigo}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Comprobando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Enviar"}</Button>
+                        </>
+                        :<>
+                            {/* <h1>CAMBIAR CONTRASEÑA</h1> */}
+                            <Password onChange={(e)=>{setClave(e.target.value)}} error={error} label="Contraseña Nueva"/>
+                            <Password onChange={(e)=>{setClaveRepe(e.target.value)}} error={error} label="Repetir Contraseña"/>
+                            <Button variant='outlined' onClick={cambiar}>Enviar</Button>
+                        </>}
+                        {error?<p className="red">{mensaje}</p>:""}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

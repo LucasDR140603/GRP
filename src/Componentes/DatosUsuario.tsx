@@ -7,7 +7,7 @@ import api from "../Api.tsx"
 import Input from "./Input.tsx"
 import { comprobar, sin_acentos, vacio } from "../Funciones.tsx"
 import ReactFlagsSelect from 'react-flags-select'
-import {TextField,Button,Dialog,DialogTitle,DialogContent,IconButton,Paper,Table,TableBody as Tbody,TableCell as Td,TableRow as Tr,TableContainer,Alert} from '@mui/material'
+import {TextField,Button,Dialog,DialogTitle,DialogContent,IconButton,Paper,Table,TableBody as Tbody,TableCell as Td,TableRow as Tr,TableContainer,Alert,Box} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
@@ -39,51 +39,54 @@ export default function(){
                     <CloseIcon/>
                 </IconButton>
             </DialogTitle>
-            <DialogContent dividers={true} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
-                <div style={{display:'flex',flexDirection:c=="telefono"?'row':'column',gap:'0.5rem',alignItems:'center'}}>
-                {campos.map((x,i)=>{
-                    return x=="pais"?<ReactFlagsSelect className="banderas" searchable={true} selected={nuevo.pais} onSelect={(e)=>{setNuevo({...nuevo,pais:e})}}/>:<Input value={nuevo[x]} type={x=="telefono"?"tel":x.includes("clave")?"password":"text"} onChange={(e)=>{setNuevo({...nuevo,[x]:e})}} label={c=="contraseña"?i==0?"Contraseña":"Repetir contraseña":x} error={c=='contraseña' && i!=0?nuevo['clave_repe']!=nuevo['clave']:false}/>
-                })}
-                </div>
-                <Button variant="outlined" style={{margin:'0rem auto',marginTop:'0.75rem',}} onClick={()=>{
+            <DialogContent dividers={true}>
+                <Box component='form' onSubmit={(event)=>{
+                    event.preventDefault()
                     let n={...nuevo,telefono:`+${getCountryCallingCode('ES')}${nuevo.telefono}`}
-                    let e=false
-                    if (c=="contraseña"){
-                        if (vacio(n[campos[0]]) || n[campos[0]]!=n[campos[1]] || !comprobar(n[campos[0]])){
-                            e=true
-                            setError(true)
-                            if (vacio(n[campos[0]])){
-                                setMensaje("Contraseña vacía")
-                            }
-                            else if (n[campos[0]]!=n[campos[1]]){
-                                setMensaje("Las contraseñas no coinciden")
-                            }
-                            else{
-                                setMensaje("La contraseña debe tener como mínimo 8 caracteres, una mayúscula, una minúscula, un nº y un símbolo")
-                            }
-                        }
-                    }
-                    else{
-                        if (c=="telefono"){
-                            if (nuevo["telefono"].length<9){
+                        let e=false
+                        if (c=="contraseña"){
+                            if (vacio(n[campos[0]]) || n[campos[0]]!=n[campos[1]] || !comprobar(n[campos[0]])){
                                 e=true
                                 setError(true)
-                                setMensaje("El teléfono debe tener 9 dígitos")
+                                if (vacio(n[campos[0]])){
+                                    setMensaje("Contraseña vacía")
+                                }
+                                else if (n[campos[0]]!=n[campos[1]]){
+                                    setMensaje("Las contraseñas no coinciden")
+                                }
+                                else{
+                                    setMensaje("La contraseña debe tener como mínimo 8 caracteres, una mayúscula, una minúscula, un nº y un símbolo")
+                                }
                             }
                         }
-                        delete n.clave
-                    }
-                    if (!e){
-                        api.put('usuarios',n).then((res)=>{
-                            setAcierto(true)
-                            setMensaje(`${campo} editad${c=="contraseña"?"a":"o"} con éxito`)
-                        }).catch((error)=>{
-                            setMensaje("Campo repetido")
-                            setError(true)
-                        })
-                    }
-                }}>Confirmar</Button>
-                {error || acierto?<Alert severity={error?'error':'success'} style={{marginBottom:'0',textAlign:'center'}}>{mensaje}</Alert>:null}
+                        else{
+                            if (c=="telefono"){
+                                if (nuevo["telefono"].length<9){
+                                    e=true
+                                    setError(true)
+                                    setMensaje("El teléfono debe tener 9 dígitos")
+                                }
+                            }
+                            delete n.clave
+                        }
+                        if (!e){
+                            api.put('usuarios',n).then((res)=>{
+                                setAcierto(true)
+                                setMensaje(`${campo} editad${c=="contraseña"?"a":"o"} con éxito`)
+                            }).catch((error)=>{
+                                setMensaje("Campo repetido")
+                                setError(true)
+                            })
+                        }
+                }} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+                    <div style={{display:'flex',flexDirection:c=="telefono"?'row':'column',gap:'0.5rem',alignItems:'center',width:'100%'}}>
+                    {campos.map((x,i)=>{
+                        return x=="pais"?<ReactFlagsSelect className="banderas" searchable={true} selected={nuevo.pais} onSelect={(e)=>{setNuevo({...nuevo,pais:e})}}/>:<Input value={nuevo[x]} style={{'width':'100%'}} type={x=="telefono"?"tel":x.includes("clave")?"password":"text"} onChange={(e)=>{setNuevo({...nuevo,[x]:e})}} label={c=="contraseña"?i==0?"Contraseña":"Repetir contraseña":x} error={c=='contraseña' && i!=0?nuevo['clave_repe']!=nuevo['clave']:false}/>
+                    })}
+                    </div>
+                    <Button variant="outlined" style={{margin:'0rem auto',marginTop:'0.75rem',}} type="submit">Confirmar</Button>
+                    {error || acierto?<Alert severity={error?'error':'success'} style={{marginBottom:'0',textAlign:'center'}}>{mensaje}</Alert>:null}
+                </Box>
             </DialogContent>
         </>
     }

@@ -8,8 +8,9 @@ a{
   min-height: 100vh;
 }
 .logo{
-  filter: drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) saturate(5);
-  height: 10vmin;
+  /* filter: drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) drop-shadow(0 0 0.05rem white) saturate(5);
+  height: 10vmin; */
+  height: 6vmin;
 }
 header {
   font-size: calc(10px + 2vmin);

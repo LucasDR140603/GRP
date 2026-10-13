@@ -29,7 +29,8 @@ const theme=createTheme({
                     border:'1px solid #7b8181',
                 }
             }
-        }
+        },
+        
     }
 })
 export default theme;

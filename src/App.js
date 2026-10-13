@@ -15,7 +15,7 @@ import { Route,Routes,Navigate,Link, useLocation } from 'react-router-dom';
 import { BallTriangle } from 'react-loader-spinner';
 import { fechaSQL,reemplazarAcentos, url } from './Funciones.tsx';
 import Perfil from './Componentes/Perfil.tsx';
-import logo from './logo.png'
+import logo from './Asinova.png'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { ThemeProvider,CssBaseline,Button,Stack } from '@mui/material';
@@ -87,7 +87,7 @@ function App() {
                 </div>} */}
               </>
               :null}
-              <Link to={'/'} style={{fontSize:0}}><Button style={{paddingBlock:0}}><img src={logo} className='logo'/></Button></Link>
+              <Link to={'/'} style={{fontSize:0}}><Button style={{padding:'0.75rem'}}><img src={logo} className='logo'/></Button></Link>
             </div>
           </header>
           <main>

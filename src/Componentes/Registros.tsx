@@ -17,7 +17,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import FiltroMenu from './FiltroMenu.tsx'
 export default function(){
     const [open,setOpen]=useState(-1)
-    const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
+    const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario,clientes_con_proyecto}=useData()
     const [orden,setOrden]=useState<string | null>(null)
     const [sentido,setSentido]=useState<number | null>(null)
     const [terminados,setTerminados]=useState(true)
@@ -199,14 +199,17 @@ export default function(){
         <div className="component">
             <div className="btnbox">
                 <Button variant='outlined' onClick={()=>{setSeleccion(seleccion==null?()=>{
+                    let cliente=clientes_con_proyecto[0]
+                    let centro=centros.find((x:any)=>x.id_cliente==cliente.id)
+                    let proyecto=proyectos.find((x:any)=>x.id_centro==centro.id)
                     let ultimo=registros.find((x:any)=>x.id_usuario==usuario.id)??{
-                        "cliente": clientes[0].nombre,
-                        "centro": centros.find((x:any)=>x.id_cliente==clientes[0].id).nombre,
-                        "proyecto": proyectos.find((x:any)=>x.id_centro==centros.find((y:any)=>y.id_cliente==clientes[0].id).id).nombre,
+                        "cliente": cliente.nombre,
+                        "centro": centro.nombre,
+                        "proyecto": proyecto.nombre,
                         "usuario": usuario.nick,
-                        "id_cliente": clientes[0].id,
-                        "id_centro": centros.find((x:any)=>x.id_cliente==clientes[0].id).id,
-                        "id_proyecto": proyectos.find((x:any)=>x.id_centro==centros.find((y:any)=>y.id_cliente==clientes[0].id).id).id,
+                        "id_cliente": cliente.id,
+                        "id_centro": centro.id,
+                        "id_proyecto": proyecto.id,
                         "id_usuario": usuario.id,
                         "id": "",
                         "observaciones": null,

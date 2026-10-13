@@ -1,7 +1,7 @@
 import { useData } from "../DataContext.tsx";
 import { useEffect, useState } from "react";
 import api from "../Api.tsx";
-import {Checkbox,FormControlLabel,Select,MenuItem,TextField,Button} from '@mui/material'
+import {Checkbox,FormControlLabel,Select,MenuItem,TextField,Button,Alert} from '@mui/material'
 interface Props{
     x:Record<string,any>
     editar:boolean
@@ -56,7 +56,7 @@ export default function({x,editar=false}:Props){
             <TextField error={error} label="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%'}}/>
             {x.id!=null?<FormControlLabel control={<Checkbox/>} checked={abierto} label='Abierto' onChange={(e)=>{setAbierto(!abierto)}}/>:null}
             <Button variant='outlined' onClick={enviar}>Confirmar</Button>
-            {acierto || error?<p className={error?"red":"aqua"} style={{marginBlock:0}}>{acierto?`Centro ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</p>:null}
+            {acierto || error?<Alert severity={error?"error":"success"}>{acierto?`Centro ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</Alert>:null}
         </div>
     )
 }

@@ -124,7 +124,6 @@ export default function(){
             setToken(res.data.token)
             setCodigoCorrecto(true)
         }).catch((error)=>{
-            alert(error.toString())
             setError(true)
             setMensaje("Código incorrecto")
         }).finally(()=>{
@@ -156,8 +155,8 @@ export default function(){
             <div className="form-page">
                 <h1>INICIAR SESIÓN</h1>
                 <div className="form">
-                    <TextField ref={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} label='Nick o Email' error={error} onChange={(e)=>{setUser(e.target.value)}}/>
-                    <Password label="Contraseña" onChange={(e)=>{setClave(e.target.value)}} error={error}/>
+                    <TextField inputRef={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} label='Nick o Email' error={error} onChange={(e)=>{setUser(e.target.value)}}/>
+                    <Password ref={(el:any) => (inputRefs.current[1] = el)} label="Contraseña" onChange={(e)=>{setClave(e.target.value)}} error={error}/>
                     <Button variant="outlined" onClick={()=>{loguear()}}>Iniciar Sesión</Button>
                     <a onClick={()=>{setRecuperar(true)}}>¿Contraseña olvidada?</a>
                 </div>

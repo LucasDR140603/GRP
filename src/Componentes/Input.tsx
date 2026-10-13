@@ -13,14 +13,14 @@ interface Props{
     label:string,
     error?:boolean,
     maxLength?:number | undefined,
-    ref?:any
+    ref?:React.Ref<any>
 }
-export default function({value=null,onChange=(e)=>{},className="",style={},type="text",label="",error=false,maxLength=undefined,ref=useRef(null)}:Props){
+export default function({value=null,onChange=(e)=>{},className="",style={},type="text",label="",error=false,maxLength=undefined,ref=null}:Props){
     const [mostrar,setMostrar]=useState(false)
     const tipo=type.toLowerCase()
     const clave=tipo=="password"
     const tel=tipo=="tel"
-    return <TextField value={value} style={{...style}} type={(clave && mostrar)?"text":tipo} error={error} label={label} onChange={(e)=>{
+    return <TextField inputRef={ref} value={value} style={{...style}} type={(clave && mostrar)?"text":tipo} error={error} label={label} onChange={(e)=>{
         let v=e.target.value
         if (tel){
             v=v.replace(/\D/g,'')

@@ -1,7 +1,7 @@
 import { format, formatDate, parse } from "date-fns";
 import { useData } from "../DataContext.tsx";
 import { useEffect, useRef, useState } from "react";
-import {FormControlLabel,Checkbox,TextField,Select,MenuItem,Button} from '@mui/material'
+import {FormControlLabel,Checkbox,TextField,Select,MenuItem,Button,Alert} from '@mui/material'
 import api from "../Api.tsx";
 interface Props{
     x:Record<string,any>
@@ -49,7 +49,7 @@ export default function({x,editar=false}:Props){
         const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 if(descRef.current!=document.activeElement){
-                    // enviar()
+                    enviar()
                 }
             }
         }
@@ -74,9 +74,9 @@ export default function({x,editar=false}:Props){
     return <div className="column">
         {selects()}
         <TextField type="text" error={error} label="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%'}}/>
-        <TextField style={{width:'100%',height:'5rem'}} className="textarea" multiline={true} maxRows={2} ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
+        <TextField style={{width:'100%',height:'5rem'}} className="textarea" multiline={true} maxRows={2} inputRef={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
         {x.id!=null?<FormControlLabel checked={end!=null} label='Finalizado' control={<Checkbox/>} onChange={(e)=>{setEnd(end!=null?null:formatDate(new Date(),formato).replace(' ','T'))}}/>:null}
         <Button variant='outlined' onClick={enviar}>Confirmar</Button>
-        {acierto || error?<p className={error?"red":"aqua"} style={{marginBlock:0}}>{acierto?`Proyecto ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</p>:null}
+        {acierto || error?<Alert severity={error?"error":"success"}>{acierto?`Proyecto ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</Alert>:null}
     </div>
 }

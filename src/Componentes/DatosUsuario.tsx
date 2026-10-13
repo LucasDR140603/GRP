@@ -7,7 +7,7 @@ import api from "../Api.tsx"
 import Input from "./Input.tsx"
 import { comprobar, sin_acentos, vacio } from "../Funciones.tsx"
 import ReactFlagsSelect from 'react-flags-select'
-import {TextField,Button,Dialog,DialogTitle,DialogContent,IconButton,Paper,Table,TableBody as Tbody,TableCell as Td,TableRow as Tr,TableContainer,Typography} from '@mui/material'
+import {TextField,Button,Dialog,DialogTitle,DialogContent,IconButton,Paper,Table,TableBody as Tbody,TableCell as Td,TableRow as Tr,TableContainer,Alert} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
@@ -83,8 +83,7 @@ export default function(){
                         })
                     }
                 }}>Confirmar</Button>
-                
-                {error || acierto?<p className={error?'red':'aqua'} style={{marginBottom:'0',textAlign:'center'}}>{mensaje}</p>:null}
+                {error || acierto?<Alert severity={error?'error':'success'} style={{marginBottom:'0',textAlign:'center'}}>{mensaje}</Alert>:null}
             </DialogContent>
         </>
     }

@@ -2,7 +2,7 @@ import { formatDate, parse } from "date-fns";
 import { useData } from "../DataContext.tsx";
 import { useEffect, useRef, useState } from "react";
 import api from "../Api.tsx";
-import {Button,TextField,Select,MenuItem,Checkbox,FormControlLabel} from '@mui/material'
+import {Button,TextField,Select,MenuItem,Checkbox,FormControlLabel,Alert} from '@mui/material'
 interface Props{
     x:Record<string,any>
     editar:boolean
@@ -102,7 +102,7 @@ export default function({x,editar=false}:Props){
         const handleKeyDown=(e:any)=>{
             if (e.key=="Enter"){
                 if(![descRef.current,obsRef.current].includes(document.activeElement)){
-                    // enviar()
+                    enviar()
                 }
             }
         }
@@ -124,9 +124,9 @@ export default function({x,editar=false}:Props){
     const error_fechas=end!=null && begin>end
     return <div className="column">
         {selects()}
-        <div style={{display:'grid',rowGap:'1rem',columnGap:'1rem',gridTemplateRows:`repeat(${x.fin==null && end!=null?5:4},1fr)`}}>
-            <TextField className='textarea' multiline={true} maxRows={2} ref={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
-            <TextField className='textarea' multiline={true} maxRows={2} ref={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} label="Observaciones"/>
+        <div style={{display:'grid',rowGap:'0.5rem',columnGap:'0.5rem',gridTemplateRows:`repeat(${x.fin==null && end!=null?5:4},1fr)`}}>
+            <TextField className='textarea' multiline={true} maxRows={2} inputRef={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
+            <TextField className='textarea' multiline={true} maxRows={2} inputRef={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} label="Observaciones"/>
             <TextField type="datetime-local" error={error_fechas} onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
             {x.id==null || x.fin==null?<FormControlLabel control={<Checkbox/>} label="Terminado" onChange={(e)=>{setEnd(end!=null?null:begin)}}/>:null}
             {end!=null?<TextField style={{gridColumn:'1',gridRow:x.fin==null?5:4}} error={error_fechas} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
@@ -135,7 +135,7 @@ export default function({x,editar=false}:Props){
             })}
         </div>
         <Button variant='outlined' onClick={enviar}>Confirmar</Button>
-        {acierto?<p className="aqua" style={{marginBlock:0}}>Registro {editar?"editado":"añadido"} con éxito</p>:null}
-        {error?<p className="red" style={{marginBlock:0}}>ERROR{error_fechas?": La fecha de inicio no debe ser mayor a la de fin.":""}</p>:null}
+        {acierto?<Alert severity='success'>Registro {editar?"editado":"añadido"} con éxito</Alert>:null}
+        {error?<Alert severity='error'>ERROR{error_fechas?": La fecha de inicio no debe ser mayor a la de fin.":""}</Alert>:null}
     </div>
 }

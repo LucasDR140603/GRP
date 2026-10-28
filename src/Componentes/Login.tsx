@@ -8,7 +8,7 @@ import api from "../Api.tsx";
 import { comprobar } from "../Funciones.tsx";
 import {useTimer} from 'react-timer-hook'
 import Turnstile from "react-turnstile";
-import {TextField,Dialog,DialogTitle,DialogContent,IconButton,Button} from '@mui/material'
+import {TextField,Dialog,DialogTitle,DialogContent,IconButton,Button,Alert} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 export default function(){
     const {init}=useData()
@@ -161,8 +161,6 @@ export default function(){
                     <a onClick={()=>{setRecuperar(true)}}>¿Contraseña olvidada?</a>
                 </div>
             </div>
-            <div>
-            </div>
             <Dialog open={recuperar} onClose={(event,reason)=>{
                 if (reason && reason=='backdropClick'){
                     return;
@@ -195,7 +193,7 @@ export default function(){
                             <Password onChange={(e)=>{setClaveRepe(e.target.value)}} error={error} label="Repetir Contraseña"/>
                             <Button variant='outlined' onClick={cambiar}>Enviar</Button>
                         </>}
-                        {error?<p className="red">{mensaje}</p>:""}
+                        {error?<Alert severity='error'>{mensaje}</Alert>:""}
                     </div>
                 </DialogContent>
             </Dialog>

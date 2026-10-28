@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import {styled} from '@mui/material/styles'
+import CountrySelector from "./CountrySelector.tsx"
 const VisuallyHiddenInput=styled('input')({
     clipPath:'inset(50%)',
     height:1,
@@ -42,7 +43,7 @@ export default function(){
             <DialogContent dividers={true}>
                 <Box component='form' onSubmit={(event)=>{
                     event.preventDefault()
-                    let n={...nuevo,telefono:`+${getCountryCallingCode('ES')}${nuevo.telefono}`}
+                    let n={...nuevo,telefono:`+${getCountryCallingCode(nuevo.pais)}${nuevo.telefono}`}
                         let e=false
                         if (c=="contraseña"){
                             if (vacio(n[campos[0]]) || n[campos[0]]!=n[campos[1]] || !comprobar(n[campos[0]])){
@@ -81,7 +82,7 @@ export default function(){
                 }} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                     <div style={{display:'flex',flexDirection:c=="telefono"?'row':'column',gap:'0.5rem',alignItems:'center',width:'100%'}}>
                     {campos.map((x,i)=>{
-                        return x=="pais"?<ReactFlagsSelect className="banderas" searchable={true} selected={nuevo.pais} onSelect={(e)=>{setNuevo({...nuevo,pais:e})}}/>:<Input value={nuevo[x]} style={{'width':'100%'}} type={x=="telefono"?"tel":x.includes("clave")?"password":"text"} onChange={(e)=>{setNuevo({...nuevo,[x]:e})}} label={c=="contraseña"?i==0?"Contraseña":"Repetir contraseña":x} error={c=='contraseña' && i!=0?nuevo['clave_repe']!=nuevo['clave']:false}/>
+                        return x=="pais"?<CountrySelector value={nuevo.pais} onChange={(e)=>{setNuevo({...nuevo,pais:e.target.value})}}/>:<Input value={nuevo[x]} style={{'width':'100%'}} type={x=="telefono"?"tel":x.includes("clave")?"password":"text"} onChange={(e)=>{setNuevo({...nuevo,[x]:e})}} label={c=="contraseña"?i==0?"Contraseña":"Repetir contraseña":x} error={c=='contraseña' && i!=0?nuevo['clave_repe']!=nuevo['clave']:false}/>
                     })}
                     </div>
                     <Button variant="outlined" style={{margin:'0rem auto',marginTop:'0.75rem',}} type="submit">Confirmar</Button>

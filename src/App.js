@@ -11,7 +11,7 @@ import {useData} from './DataContext.tsx';
 import { useEffect,useState } from 'react';
 import Cookies from 'js-cookie'
 import api from './Api.tsx';
-import { Route,Routes,Navigate,Link, useLocation } from 'react-router-dom';
+import { Route,Routes,Navigate,Link,useLocation } from 'react-router-dom';
 import { BallTriangle } from 'react-loader-spinner';
 import { fechaSQL,reemplazarAcentos, url } from './Funciones.tsx';
 import Perfil from './Componentes/Perfil.tsx';

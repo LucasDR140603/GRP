@@ -371,7 +371,7 @@ h1{
   width: fit-content;
   flex-direction: column;
   margin: 0 auto;
-  gap:1rem
+  gap:0.25rem
 }
 .options>div:not(.MuiFormControl-root){
   display: flex;

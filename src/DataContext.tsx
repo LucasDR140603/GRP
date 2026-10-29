@@ -63,6 +63,14 @@ export const DataProvider=({children}:any)=>{
         else{
             setCargando(false)
         }
+        // Al volver desde la caché back/forward el socket estuvo cerrado y se perdieron eventos
+        const restaurar=(e:PageTransitionEvent)=>{
+            if (e.persisted){
+                window.location.reload()
+            }
+        }
+        window.addEventListener('pageshow',restaurar)
+        return ()=>window.removeEventListener('pageshow',restaurar)
     },[])
     useEffect(()=>{
         getClienteByCentro.current=(x:elemento)=>{

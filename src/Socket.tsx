@@ -36,6 +36,7 @@ export function connect(){
     })
 }
 export function disconnect(){
+    s?.disconnect()
     s=null
 }
 export function getSocket(){

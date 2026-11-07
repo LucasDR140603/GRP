@@ -345,38 +345,6 @@ export default function(){
                 }}>
                 <FiltroMenu lista={filtros[open]} set={setsFiltros[open]}/>
             </Menu>
-            {/* <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>{columnas.map((x,i)=>{
-                            let v=sin_acentos(x.toLowerCase())
-                            return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
-                                return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido!=null?sentido:1)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
-                        })}</tr>
-                        <tr>{columnas.map((x,i)=>{
-                            let nc=filtros.length>0 && filtros[i]!=null && filtros[i].length>0 && filtros[i].filter((y)=>!y.checked && y.visible).length>0
-                            return <th className={nc?"bg-aqua":""} onClick={()=>{setOpen(open==i || i>3?-1:i)}}>
-                                {x}{i==columnas.length-1?": "+duracion_total:null}
-                                {open==i?
-                                    <Filtro lista={filtros[i]} set={setsFiltros[i]}/>
-                                :null}
-                            </th>
-                        })}</tr>
-                    </thead>
-                    <tbody>
-                    {ordenados().map((x)=>{
-                        let terminado=x.fin!=null
-                        let campos_inicio=x.inicio.split(' ')
-                        let campos_fin=terminado?x.fin.split(' '):'En Curso'
-                        return <tr className={x.id==seleccion?.id?'selected':terminado?'':'gold'} onClick={()=>{setSeleccion(seleccion!=null?null:x)}}><td>{x.cliente}</td><td>{x.centro}</td><td>{x.proyecto}</td><td>{x.usuario}</td><td>{campos_inicio[0]}</td><td>{campos_inicio[1]}</td>{!terminado?<td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</td>:<><td>{campos_fin[0]}</td><td>{campos_fin[1]}</td></>}<td>{x.descripcion}</td><td>{x.observaciones}</td><td>{x.duracion??'En Curso'}</td></tr>
-                    })}
-                    </tbody>
-                    <tfoot>
-                        <tr><th colSpan={columnas.length}></th></tr>
-                    </tfoot>
-                </table>
-            </div> */}
             </>}
             <Dialog sx={{color:'#121212'}} onClose={(event,reason)=>{
                 if (reason && reason==='backdropClick' && (seleccion?.id==null || [1].includes(acciones.indexOf(accion)))){

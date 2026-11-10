@@ -41,8 +41,9 @@ export default function(){
         expiryTimestamp:tiempo()
     })
     const loguear=()=>init({user:user,clave:clave}).then((res:any)=>{
-        if (Cookies.get('token')==null){
+        if (res && res.toString()=='Forbidden'){
             setError(true)
+            setMensaje('Usuario o contraseña')
         }
     })
     useEffect(()=>{
@@ -134,10 +135,7 @@ export default function(){
         if (clave==clave_repe){
             if (comprobar(clave)){
                 init({clave:clave},"cambiarclave", {headers:{"Authorization":`Bearer ${token}`}}).then((res:any)=>{
-                    if (Cookies.get('token')==null){
-                        setError(true)
-                        setMensaje("Contraseña ya usada o no hay conexión")
-                    }
+                    console.log(JSON.stringify(res))
                 })
             }
             else{
@@ -157,6 +155,7 @@ export default function(){
                 <div className="form">
                     <TextField inputRef={(el:any) => (inputRefs.current[0] = el)} style={{width:'100%'}} label='Nick o Email' error={error} onChange={(e)=>{setUser(e.target.value)}}/>
                     <Password ref={(el:any) => (inputRefs.current[1] = el)} label="Contraseña" onChange={(e)=>{setClave(e.target.value)}} error={error}/>
+                    {error && !recuperar?<Alert severity='error'>{mensaje}</Alert>:null}
                     <Button variant="outlined" onClick={()=>{loguear()}}>Iniciar Sesión</Button>
                     <a onClick={()=>{setRecuperar(true)}}>¿Contraseña olvidada?</a>
                 </div>

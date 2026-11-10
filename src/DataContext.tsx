@@ -30,11 +30,9 @@ export const DataProvider=({children}:any)=>{
     const clientes_con_proyecto:elemento[]=clientes.filter((x)=>centros.find((y)=>x.id==y.id_cliente && proyectos_abiertos.find((z)=>y.id==z.id_centro)!=null)!=null)
     const centros_con_proyecto:elemento[]=centros.filter((x)=>proyectos_abiertos.find((y)=>x.id==y.id_centro)!=null)
     const init=async(x:elemento,accion:string='login',config={})=>{
-        setCargando(true)
         try{
-            const {token,refreshToken,usuario}=(await api.post(accion,x,config)).data
-            Cookies.set("token",token,{expires:1})
-            Cookies.set("refreshToken",refreshToken,{expires:7})
+            const usuario=(await api.post(accion,x,config)).data
+            setCargando(true)
             connect()
             setSocket(getSocket())
             setUsuario(usuario)
@@ -45,25 +43,13 @@ export const DataProvider=({children}:any)=>{
         }
     }
     useEffect(()=>{
-        const refreshToken=Cookies.get("refreshToken")
-        if (refreshToken!=undefined){
-            api.post('refresh',{refreshToken:Cookies.get("refreshToken")}).then((res)=>{
-                Cookies.set('token',res.data.token,{expires:1})
-                connect()
-                setSocket(getSocket())
-                api.post('usuario').then((res)=>{
-                    setUsuario(res.data)
-                })
-            }).catch((err)=>{
-                Cookies.remove("token")
-                Cookies.remove("refreshToken")
-                setCargando(false)
-            })
-        }
-        else{
+        api.post('usuario').then((res)=>{
+            connect()
+            setSocket(getSocket())
+            setUsuario(res.data)
+        }).catch((err)=>{
             setCargando(false)
-        }
-        // Al volver desde la caché back/forward el socket estuvo cerrado y se perdieron eventos
+        })
         const restaurar=(e:PageTransitionEvent)=>{
             if (e.persisted){
                 window.location.reload()
@@ -199,11 +185,11 @@ export const DataProvider=({children}:any)=>{
         }
     },[usuario?.id])
     useEffect(()=>{
-        if (usuario!=null){
-            if (usuarios.filter((x)=>x.id==usuario.id && x.operativo).length==0 && !cargando){
+        if (usuario!=null && !cargando){
+            if (usuarios.filter((x)=>x.id==usuario.id && x.operativo).length==0){
                 logout()
             }
-            else{
+            else {
                 setUsuario(usuarios.filter((x)=>x.id==usuario.id)[0])
             }
         }
@@ -219,9 +205,8 @@ export const DataProvider=({children}:any)=>{
         }
     },[usuario?.administrador])
     const logout=()=>{
+        api.post('logout')
         setUsuario(null)
-        Cookies.remove("token")
-        Cookies.remove("refreshToken")
         setCargando(false)
     }
     const value:any={

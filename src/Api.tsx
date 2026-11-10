@@ -4,32 +4,24 @@ export const secure:boolean=true
 export const host:string=`http${secure?'s':''}://${secure?'www.asinova.es':'localhost:8080'}`
 export const url:string=`${host}/webapi`
 const api:AxiosInstance=axios.create({
-    baseURL:url
+    baseURL:url,
+    withCredentials:true
 })
 api.interceptors.request.use((config:InternalAxiosRequestConfig)=>{
-    const token:string | undefined=Cookies.get("token")
-    //console.log(token)
     if (!(config.data instanceof FormData)){
         config.headers['Content-Type']='application/json'
     }
-    if (token) config.headers.Authorization=`Bearer ${token}`
     return config
 })
 api.interceptors.response.use(
     (response:AxiosResponse)=>response,
     async (error:AxiosError)=>{
-        if (error.response?.status===401){
-            const refreshToken:string | undefined=Cookies.get("refreshToken")
-            if (!refreshToken) return Promise.reject(error)
+        const original:any=error.config
+        if (error.response?.status===401 && original && !original._retry && !original.url?.includes('refresh')){
+            original._retry=true
             try{
-                const res=await axios.post(`${url}/refresh`,{
-                    "refreshToken":refreshToken
-                })
-                Cookies.set("token",res.data.token,{expires:1})
-                if (error.config!=undefined){
-                    error.config.headers.Authorization=`Bearer ${res.data.token}`
-                    return axios(error.config)
-                }
+                await api.post(`refresh`)
+                return api(original)
             }
             catch{
                 return Promise.reject(error)

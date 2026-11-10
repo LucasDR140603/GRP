@@ -40,7 +40,7 @@ function App() {
     <ThemeProvider theme={theme}>
       {/* <CssBaseline/> */}
       <div className="App" onClick={()=>{setOptions(false)}}>
-        {cargando && Cookies.get('token')!=null?
+        {cargando?
           <div style={{margin:'0 auto',display:'flex',alignItems:'center',flex:'1'}}><BallTriangle
             height={100}
             width={100}

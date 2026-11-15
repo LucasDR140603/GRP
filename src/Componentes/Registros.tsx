@@ -17,7 +17,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import FiltroMenu from './FiltroMenu.tsx'
 export default function(){
     const [open,setOpen]=useState(-1)
-    const {clientes,centros,proyectos,usuarios,registros,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario,clientes_con_proyecto}=useData()
+    const {clientes,centros,proyectos,usuarios,registros,proyectos_abiertos,registros_editables,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario,clientes_con_proyecto}=useData()
     const [orden,setOrden]=useState<string | null>(null)
     const [sentido,setSentido]=useState<number | null>(null)
     const [terminados,setTerminados]=useState(true)
@@ -198,11 +198,11 @@ export default function(){
     return (
         <div className="component">
             <div className="btnbox">
-                <Button variant='outlined' onClick={()=>{setSeleccion(seleccion==null?()=>{
+                {proyectos_abiertos.length>0 && <Button variant='outlined' onClick={()=>{setSeleccion(seleccion==null?()=>{
                     let cliente=clientes_con_proyecto[0]
                     let centro=centros.find((x:any)=>x.id_cliente==cliente.id)
                     let proyecto=proyectos.find((x:any)=>x.id_centro==centro.id)
-                    let ultimo=registros.find((x:any)=>x.id_usuario==usuario.id)??{
+                    let ultimo=registros_editables[0]??{
                         "cliente": cliente.nombre,
                         "centro": centro.nombre,
                         "proyecto": proyecto.nombre,
@@ -211,7 +211,6 @@ export default function(){
                         "id_centro": centro.id,
                         "id_proyecto": proyecto.id,
                         "id_usuario": usuario.id,
-                        "id": "",
                         "observaciones": null,
                         "km": 0,
                         "desplazamiento": 0,
@@ -221,7 +220,7 @@ export default function(){
                     let nuevo={...ultimo,inicio:formatDate(new Date(),"dd/MM/yyyy HH:mm"),fin:null,descripcion:null}
                     delete nuevo.id
                     return nuevo
-                }:null)}}>Añadir</Button>
+                }:null)}}>Añadir</Button>}
                 <Button variant='outlined' onClick={()=>{
                     toExcel(ordenados().map((x)=>{
                         let terminado=x.fin!=null
@@ -275,7 +274,6 @@ export default function(){
                 :null}
             </div>
             <h1>REGISTROS</h1>
-            {/* <DatePicker label="Desde" onChange={(newValue)=>{alert(newValue)}}/> */}
             <div className="options">
                 <div>
                     <IconButton onClick={()=>{cambiarDia(-1)}}>
@@ -367,7 +365,7 @@ export default function(){
                         <p>Va a eliminar un registro. Acción irreversible</p>
                         <Button variant='outlined' onClick={()=>{setConfirmacion(true)}}>Confirmar</Button>
                         </div>
-                        :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(registros.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
+                        :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(registros_editables.filter((y:any)=>y.id==seleccion.id).length==0 || (i==0 && registros.find((y:any)=>y.id==seleccion.id).fin!=null))?null:<Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
                         }
                     </DialogContent>
                     </>:null}

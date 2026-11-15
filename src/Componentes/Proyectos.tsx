@@ -16,7 +16,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import FiltroMenu from './FiltroMenu.tsx'
 export default function(){
     const [open,setOpen]=useState(-1)
-    const {clientes,centros,proyectos,usuarios,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
+    const {clientes,centros,centros_abiertos,proyectos,proyectos_editables,usuarios,getClienteByCentro,getCentroByProyecto,getClienteByProyecto,usuario}=useData()
     const [orden,setOrden]=useState<string | null>(null)
     const [sentido,setSentido]=useState<number | null>(null)
     const [abiertos,setAbiertos]=useState(true)
@@ -172,41 +172,16 @@ export default function(){
             window.removeEventListener('keydown',handleKeyDown)
         }
     },[accion])
-    const opciones=()=>{
-        if (seleccion!=null && seleccion.id!=null && mostrables.find((x)=>x.id==seleccion.id)==null){
-            setSeleccion(null)
-        }
-        return seleccion!=null?
-            <div className="ventana-emergente" style={{display:'flex',gap:'1rem',alignItems:'center'}}>
-                {seleccion.id==null || accion==acciones[0]?
-                <AddEditProyecto x={seleccion.id==null?seleccion:proyectos.find((y:any)=>y.id==seleccion.id)} editar={accion==acciones[0]}/>
-                :
-                <>{acciones.map((x,i)=><a className="btn" onClick={()=>{setAccion(x)}}>{x}</a>)}</>
-                }
-                <Close onClick={()=>{setSeleccion(null)}} absolute={seleccion.id==null || accion==acciones[0]}/>
-            </div>
-            :null
-    }
-    const confirmar=()=>{
-        return accion==acciones[1]?
-        <div className="ventana-emergente">
-            <Close onClick={()=>{setAccion("")}} absolute={true}/>
-            <h1 style={{marginBlock:0}}>ALERTA</h1>
-            <p>Va a eliminar un proyecto y con él sus registros. Acción irreversible</p>
-            <a className="btn" onClick={()=>{setConfirmacion(true)}} style={{margin:'0 auto'}}>Confirmar</a>
-        </div>
-        :null
-    }
     return (
         <div className="component">
-            {usuario.administrador?<div className="btnbox">
+            {usuario.administrador && centros_abiertos.length>0 && <div className="btnbox">
                 <Button variant='outlined' onClick={()=>{
                     setSeleccion(seleccion==null?()=>{
-                    let ultimo={nombre:"",id_centro:proyectos[0].id_centro,inicio:formatDate(new Date(),"yyyy-MM-dd HH:mm").replace(' ','T'),fin:null,descripcion:null}
+                    let ultimo={nombre:"",id_centro:proyectos_editables[0]?.id_centro || centros_abiertos[0].id,inicio:formatDate(new Date(),"yyyy-MM-dd HH:mm").replace(' ','T'),fin:null,descripcion:null}
                     return ultimo
                 }:null)
                 }}>Añadir</Button>
-            </div>:null}
+            </div>}
             <h1>PROYECTOS</h1>
             <div className="options">
                 <div>
@@ -279,42 +254,6 @@ export default function(){
                 }}>
                 <FiltroMenu lista={filtros[open]} set={setsFiltros[open]}/>
             </Menu>
-            {/* <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>{columnas.map((x,i)=>{
-                            let v=sin_acentos(x.toLowerCase())
-                            return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
-                                return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido==null?1:sentido)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
-                        })}</tr>
-                        <tr>{columnas.map((x,i)=>{
-                            let nc=filtros.length>0 && filtros[i]!=null && filtros[i].length>0 && filtros[i].filter((y)=>!y.checked && y.visible).length>0
-                            return <th className={nc?"bg-aqua":""} onClick={()=>{setOpen(open==i || i>1?-1:i)}}>
-                                {x}
-                                {open==i?
-                                    <Filtro lista={filtros[i]} set={setsFiltros[i]}/>
-                                :null}
-                            </th>
-                        })}</tr>
-                    </thead>
-                    <tbody>
-                    {ordenados().map((x)=>{
-                        let terminado=x.fin!=null
-                        let campos_inicio:string[]=x.inicio.split('T')
-                        let campos_fin=terminado?x.fin.split('T'):'En Curso'
-                        campos_inicio[0]=campos_inicio[0].split('-').toReversed().reduce((x,y)=>x+"/"+y)
-                        if (terminado){
-                            campos_fin[0]=campos_fin[0].split('-').toReversed().reduce((x:string,y:string)=>x+"/"+y)
-                        }
-                        return <tr className={x.id==seleccion?.id?'selected':terminado?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><td>{getClienteByProyecto.current(x).nombre}</td><td>{getCentroByProyecto.current(x).nombre}</td><td>{x.nombre}</td><td>{x.descripcion}</td><td>{campos_inicio[0]}</td><td>{campos_inicio[1]}</td>{!terminado?<td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</td>:<><td>{campos_fin[0]}</td><td>{campos_fin[1]}</td></>}</tr>
-                    })}
-                    </tbody>
-                    <tfoot>
-                        <tr><th colSpan={columnas.length}></th></tr>
-                    </tfoot>
-                </table>
-            </div> */}
             <Dialog onClose={(event,reason)=>{
                 if (reason && reason==='backdropClick' && (seleccion?.id==null || [0,1].includes(acciones.indexOf(accion)))){
                     return
@@ -336,7 +275,7 @@ export default function(){
                         <p>Va a eliminar un proyecto y con él sus registros. Acción irreversible</p>
                         <Button variant='outlined' onClick={()=>{setConfirmacion(true)}}>Confirmar</Button>
                     </div>
-                    :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=><Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
+                    :<div style={{display:'flex',gap:'1rem'}}>{acciones.map((x,i)=>(i>0 || proyectos_editables.includes(seleccion)) && <Button variant='outlined' onClick={()=>{setAccion(x)}}>{x}</Button>)}</div>
                     }
                 </DialogContent>
                 </>:null}

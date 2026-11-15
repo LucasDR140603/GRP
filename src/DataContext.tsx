@@ -5,8 +5,8 @@ import { connect,getSocket,disconnect } from "./Socket.tsx"
 import { fechaSQL } from "./Funciones.tsx"
 import { Socket } from "socket.io-client"
 const DataContext=createContext(undefined)
-type elemento=Record<string,any>
-type objeto=elemento | null
+export type elemento=Record<string,any>
+export type objeto=elemento | null
 export const DataProvider=({children}:any)=>{
     const prevuser=useRef<objeto>(null)
     const [cargando,setCargando]=useState<boolean>(true)
@@ -16,6 +16,7 @@ export const DataProvider=({children}:any)=>{
     const [proyectos,setProyectos]=useState<elemento[]>([])
     const [registros,setRegistros]=useState<elemento[]>([])
     const [usuarios,setUsuarios]=useState<elemento[]>([])
+    const datos=[clientes,centros,proyectos,usuarios,registros]
     const sets=[setClientes,setCentros,setProyectos,setUsuarios,setRegistros]
     const acciones=Array('insert','update','delete')
     const tablas=Array('clientes','centros','proyectos','usuarios','registros')
@@ -29,6 +30,9 @@ export const DataProvider=({children}:any)=>{
     const clientes_con_centro:elemento[]=clientes.filter((x)=>centros_abiertos.find((y)=>x.id==y.id_cliente)!=null)
     const clientes_con_proyecto:elemento[]=clientes.filter((x)=>centros.find((y)=>x.id==y.id_cliente && proyectos_abiertos.find((z)=>y.id==z.id_centro)!=null)!=null)
     const centros_con_proyecto:elemento[]=centros.filter((x)=>proyectos_abiertos.find((y)=>x.id==y.id_centro)!=null)
+    const centros_editables:elemento[]=centros.filter((x)=>clientes_abiertos.filter((y)=>y['id']==x['id_cliente']).length>0)
+    const proyectos_editables:elemento[]=proyectos.filter((x)=>centros_abiertos.filter((y)=>y['id']==x['id_centro']).length>0)
+    const registros_editables:elemento[]=registros.filter((x)=>x['id_usuario']==usuario!['id'])
     const init=async(x:elemento,accion:string='login',config={})=>{
         try{
             const usuario=(await api.post(accion,x,config)).data
@@ -210,7 +214,7 @@ export const DataProvider=({children}:any)=>{
         setCargando(false)
     }
     const value:any={
-        init,clientes_abiertos,centros_abiertos,proyectos_abiertos,clientes_con_centro,clientes_con_proyecto,centros_con_proyecto,getClienteByCentro,getClienteByProyecto,getCentroByProyecto,prevuser,cargando,usuario,usuarios,setUsuario,clientes,centros,proyectos,registros,logout
+        init,clientes_abiertos,centros_abiertos,proyectos_abiertos,clientes_con_centro,clientes_con_proyecto,centros_con_proyecto,centros_editables,proyectos_editables,registros_editables,getClienteByCentro,getClienteByProyecto,getCentroByProyecto,prevuser,cargando,usuario,usuarios,setUsuario,clientes,centros,proyectos,registros,logout
     }
     return(
         <DataContext.Provider value={value}>

@@ -1,5 +1,5 @@
 import axios,{AxiosInstance,InternalAxiosRequestConfig,AxiosResponse,AxiosError} from 'axios'
-import Cookies from 'js-cookie'
+
 export const secure:boolean=true
 export const host:string=`http${secure?'s':''}://${secure?'www.asinova.es':'localhost:8080'}`
 export const url:string=`${host}/webapi`

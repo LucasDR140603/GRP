@@ -32,7 +32,7 @@ export const DataProvider=({children}:any)=>{
     const centros_con_proyecto:elemento[]=centros.filter((x)=>proyectos_abiertos.find((y)=>x.id==y.id_centro)!=null)
     const centros_editables:elemento[]=centros.filter((x)=>clientes_abiertos.filter((y)=>y['id']==x['id_cliente']).length>0)
     const proyectos_editables:elemento[]=proyectos.filter((x)=>centros_abiertos.filter((y)=>y['id']==x['id_centro']).length>0)
-    const registros_editables:elemento[]=registros.filter((x)=>x['id_usuario']==usuario!['id'])
+    const registros_editables:elemento[]=registros.filter((x)=>usuario && x['id_usuario']==usuario!['id'])
     const init=async(x:elemento,accion:string='login',config={})=>{
         try{
             const usuario=(await api.post(accion,x,config)).data

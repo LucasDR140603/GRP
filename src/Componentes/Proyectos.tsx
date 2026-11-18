@@ -228,7 +228,7 @@ export default function(){
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {ordenados().map((x)=>{
+                        {ordenados().map((x,i)=>{
                         let terminado=x.fin!=null
                         let campos_inicio:string[]=x.inicio.split('T')
                         let campos_fin=terminado?x.fin.split('T'):'En Curso'
@@ -236,7 +236,7 @@ export default function(){
                         if (terminado){
                             campos_fin[0]=campos_fin[0].split('-').toReversed().reduce((x:string,y:string)=>x+"/"+y)
                         }
-                        return <Tr sx={{cursor:'pointer'}} hover={true} selected={x.id==seleccion?.id} className={terminado?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><Td>{getClienteByProyecto.current(x).nombre}</Td><Td>{getCentroByProyecto.current(x).nombre}</Td><Td>{x.nombre}</Td><Td>{x.descripcion}</Td><Td>{campos_inicio[0]}</Td><Td>{campos_inicio[1]}</Td>{!terminado?<Td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</Td>:<><Td>{campos_fin[0]}</Td><Td>{campos_fin[1]}</Td></>}</Tr>
+                        return <Tr key={i} sx={{cursor:'pointer'}} hover={true} selected={x.id==seleccion?.id} className={terminado?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><Td>{getClienteByProyecto.current(x).nombre}</Td><Td>{getCentroByProyecto.current(x).nombre}</Td><Td>{x.nombre}</Td><Td>{x.descripcion}</Td><Td>{campos_inicio[0]}</Td><Td>{campos_inicio[1]}</Td>{!terminado?<Td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</Td>:<><Td>{campos_fin[0]}</Td><Td>{campos_fin[1]}</Td></>}</Tr>
                         })}
                     </Tbody>
                 </Table>

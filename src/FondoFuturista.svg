@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="base" cx="50%" cy="45%" r="75%">
+      <stop offset="0" stop-color="#23230f"/>
+      <stop offset="0.55" stop-color="#101210"/>
+      <stop offset="1" stop-color="#060708"/>
+    </radialGradient>
+    <linearGradient id="trace" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8860b" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffd700"/>
+      <stop offset="1" stop-color="#b8860b" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="floorFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd700" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffd700" stop-opacity="0.35"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffd700" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffd700" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="hex" width="60" height="103.92" patternUnits="userSpaceOnUse">
+      <path d="M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z M30 69.28 L30 103.92 M0 103.92 L0 86.6 M60 103.92 L60 86.6"
+            fill="none" stroke="#ffd700" stroke-width="0.6" stroke-opacity="0.06"/>
+    </pattern>
+    <mask id="floorMask">
+      <rect y="640" width="1920" height="440" fill="url(#floorFade)"/>
+    </mask>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1920" height="1080" fill="url(#base)"/>
+  <rect width="1920" height="1080" fill="url(#hex)"/>
+
+  <!-- Suelo en perspectiva -->
+  <g stroke="#ffd700" stroke-width="1" mask="url(#floorMask)" fill="none">
+    <path d="M960 640 L-1400 1080 M960 640 L-800 1080 M960 640 L-300 1080 M960 640 L160 1080 M960 640 L560 1080 M960 640 L960 1080 M960 640 L1360 1080 M960 640 L1760 1080 M960 640 L2220 1080 M960 640 L2720 1080 M960 640 L3320 1080"/>
+    <path d="M0 660 H1920 M0 690 H1920 M0 730 H1920 M0 785 H1920 M0 860 H1920 M0 960 H1920 M0 1075 H1920"/>
+  </g>
+  <rect y="630" width="1920" height="2" fill="url(#trace)" opacity="0.5" filter="url(#glow)"/>
+
+  <!-- Halos -->
+  <circle cx="1500" cy="380" r="420" fill="url(#halo)"/>
+  <circle cx="300" cy="200" r="300" fill="url(#halo)" opacity="0.6"/>
+
+  <!-- Anillos HUD -->
+  <g transform="translate(1500 380)" fill="none" stroke="#ffd700" filter="url(#glow)">
+    <circle r="260" stroke-opacity="0.12" stroke-width="1"/>
+    <circle r="230" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="4 14"/>
+    <circle r="200" stroke-opacity="0.18" stroke-width="1"/>
+    <path d="M0 -170 A170 170 0 0 1 147 85" stroke-opacity="0.45" stroke-width="3"/>
+    <path d="M-147 85 A170 170 0 0 1 -120 -120" stroke-opacity="0.3" stroke-width="3"/>
+    <circle r="130" stroke-opacity="0.15" stroke-width="10" stroke-dasharray="2 6"/>
+    <circle r="90" stroke-opacity="0.3" stroke-width="1"/>
+    <path d="M-280 0 H-215 M215 0 H280 M0 -280 V-215 M0 215 V280" stroke-opacity="0.4" stroke-width="1.5"/>
+    <circle r="6" fill="#ffd700" fill-opacity="0.6" stroke="none"/>
+  </g>
+
+  <!-- Pistas de circuito -->
+  <g fill="none" stroke="#d4a017" stroke-width="1.5" stroke-opacity="0.35" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 180 H180 L240 240 H520 L580 180 H760"/>
+    <path d="M0 260 H120 L170 310 H420"/>
+    <path d="M0 420 H90 L150 360 H300 L340 400 H600 L650 350 H900"/>
+    <path d="M60 0 V90 L120 150 V180"/>
+    <path d="M380 0 V120 L430 170 H640"/>
+    <path d="M1920 900 H1700 L1640 840 H1380 L1330 890 H1150"/>
+    <path d="M1920 820 H1780 L1740 780 H1560"/>
+    <path d="M1920 120 H1820 L1770 70 H1600 L1560 30 V0"/>
+    <path d="M1100 0 V60 L1150 110 H1240"/>
+    <path d="M0 560 H220 L270 510 H460"/>
+    <path d="M1920 560 H1830 L1790 600 H1620"/>
+  </g>
+
+  <!-- Pistas brillantes -->
+  <g fill="none" stroke="url(#trace)" stroke-width="2" filter="url(#glow)" opacity="0.8">
+    <path d="M240 240 H520"/>
+    <path d="M340 400 H600"/>
+    <path d="M1380 840 H1640"/>
+    <path d="M1600 70 H1770"/>
+  </g>
+
+  <!-- Nodos -->
+  <g fill="#10131b" stroke="#ffd700" stroke-width="1.5" filter="url(#glow)">
+    <circle cx="760" cy="180" r="5"/>
+    <circle cx="420" cy="310" r="5"/>
+    <circle cx="900" cy="350" r="5"/>
+    <circle cx="120" cy="180" r="4"/>
+    <circle cx="640" cy="170" r="5"/>
+    <circle cx="1150" cy="890" r="5"/>
+    <circle cx="1560" cy="780" r="5"/>
+    <circle cx="1240" cy="110" r="5"/>
+    <circle cx="460" cy="510" r="5"/>
+    <circle cx="1620" cy="600" r="5"/>
+  </g>
+  <g fill="#ffd700" opacity="0.9" filter="url(#glow)">
+    <circle cx="520" cy="240" r="2.5"/>
+    <circle cx="600" cy="400" r="2.5"/>
+    <circle cx="1380" cy="840" r="2.5"/>
+    <circle cx="1770" cy="70" r="2.5"/>
+  </g>
+
+  <!-- Chip -->
+  <g transform="translate(250 760)" fill="none" stroke="#ffd700" stroke-opacity="0.3" stroke-width="1.5">
+    <rect x="-60" y="-60" width="120" height="120" rx="8"/>
+    <rect x="-34" y="-34" width="68" height="68" rx="4" stroke-opacity="0.5" filter="url(#glow)"/>
+    <path d="M-40 -60 V-80 M-20 -60 V-80 M0 -60 V-80 M20 -60 V-80 M40 -60 V-80
+             M-40 60 V80 M-20 60 V80 M0 60 V80 M20 60 V80 M40 60 V80
+             M-60 -40 H-80 M-60 -20 H-80 M-60 0 H-80 M-60 20 H-80 M-60 40 H-80
+             M60 -40 H80 M60 -20 H80 M60 0 H80 M60 20 H80 M60 40 H80"/>
+  </g>
+
+  <!-- Partículas -->
+  <g fill="#fff8dc">
+    <circle cx="820" cy="90" r="1.2" opacity="0.6"/>
+    <circle cx="1010" cy="240" r="1" opacity="0.4"/>
+    <circle cx="1290" cy="520" r="1.4" opacity="0.5"/>
+    <circle cx="700" cy="560" r="1" opacity="0.4"/>
+    <circle cx="1820" cy="330" r="1.2" opacity="0.5"/>
+    <circle cx="150" cy="620" r="1" opacity="0.4"/>
+    <circle cx="1080" cy="420" r="1.6" opacity="0.3"/>
+    <circle cx="560" cy="80" r="1" opacity="0.5"/>
+    <circle cx="1700" cy="980" r="1.2" opacity="0.4"/>
+    <circle cx="880" cy="700" r="1" opacity="0.3"/>
+  </g>
+
+  <!-- Viñeta para legibilidad del contenido -->
+  <rect width="1920" height="1080" fill="#000" opacity="0.25"/>
+</svg>

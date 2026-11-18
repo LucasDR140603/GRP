@@ -146,50 +146,25 @@ export default function(){
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {ordenados().map((x)=><Tr hover={true} selected={x.id==seleccion?.id} sx={{cursor:'pointer'}} className={x.id==usuario.id?'gold':!x.operativo?'aqua':''} onClick={()=>{setSeleccion(seleccion==null && x.id!=usuario.id?x:null)}}><Td style={{lineHeight:0}}><Perfil usuario={x}/></Td><Td>{x.nick}</Td><Td>{x.nombre}</Td><Td>{x.apellido1}</Td><Td>{x.apellido2}</Td><Td>{x.email}</Td><Td>{x.telefono}</Td><Td>{x.administrador?"Sí":"No"}</Td><Td>{x.operativo?"Sí":"No"}</Td></Tr>)}
+                        {ordenados().map((x,i)=><Tr key={i} hover={true} selected={x.id==seleccion?.id} sx={{cursor:'pointer'}} className={x.id==usuario.id?'gold':!x.operativo?'aqua':''} onClick={()=>{setSeleccion(seleccion==null && x.id!=usuario.id?x:null)}}><Td style={{lineHeight:0}}><Perfil usuario={x}/></Td><Td>{x.nick}</Td><Td>{x.nombre}</Td><Td>{x.apellido1}</Td><Td>{x.apellido2}</Td><Td>{x.email}</Td><Td>{x.telefono}</Td><Td>{x.administrador?"Sí":"No"}</Td><Td>{x.operativo?"Sí":"No"}</Td></Tr>)}
                     </Tbody>
                 </Table>
             </TableContainer>
-            {/* <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>{columnas.map((x,i)=>{
-                            let v=sin_acentos(x.toLowerCase())
-                            if (v.includes("apellido")){
-                                v=v.split(' ').toReversed().reduce((x:string,y:string)=>x+y).slice(0,-1)
-                            }
-                            return <td className={orden==v?"gold":""} style={{borderCollapse:'collapse'}}><div><a onClick={()=>{setSentido(1);setOrden(prev=>{
-                                return prev==v?null:v
-                            })}}>Ordenar</a>{orden==v?<a onClick={()=>{setSentido((sentido!=null?sentido:1)*-1)}}>{sentido==-1?<HiArrowLongDown />:<HiArrowLongUp />}</a>:null}</div></td>
-                        })}</tr>
-                        <tr>
-                            {columnas.map((x)=><th>{x}</th>)}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ordenados().map((x)=><tr className={x.id==seleccion?.id?'selected':x.id==usuario.id?'gold':!x.operativo?'aqua':''} onClick={()=>{setSeleccion(seleccion==null && x.id!=usuario.id?x:null)}}><td style={{lineHeight:0}}><Perfil usuario={x}/></td><td>{x.nick}</td><td>{x.nombre}</td><td>{x.apellido1}</td><td>{x.apellido2}</td><td>{x.email}</td><td>{x.telefono}</td><td>{x.administrador?"Sí":"No"}</td><td>{x.operativo?"Sí":"No"}</td></tr>)}
-                    </tbody>
-                    <tfoot>
-                        <tr><th colSpan={columnas.length}></th></tr>
-                    </tfoot>
-                </table>
-            </div> */}
             <Dialog open={abierto} onClose={(event,reason)=>{
                 if (reason && reason==='backdropClick' && ([2].includes(acciones.indexOf(accion)))){
                     return
                 }
                 setSeleccion(null)}} aria-labelledby='customized-dialog-title'>
                 {
-                    seleccion!=null?
+                    seleccion!=null &&
                     <>
-                    {[2].includes(acciones.indexOf(accion))?
+                    {[2].includes(acciones.indexOf(accion)) &&
                     <DialogTitle sx={{m:0,paddingBlock:0,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'1rem'}} id="customized-dialog-title">
                         <p>ALERTA</p>
                         <IconButton onClick={()=>{setSeleccion(null)}} sx={{width:'fit-content'}}>
                             <CloseIcon/>
                         </IconButton>
-                    </DialogTitle>
-                    :null}
+                    </DialogTitle>}
                     <DialogContent dividers={[2].includes(acciones.indexOf(accion))}>
                         {accion==acciones[2]?
                         <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
@@ -203,7 +178,6 @@ export default function(){
                         })}</div>}
                     </DialogContent>
                     </>
-                    :null
                 }
             </Dialog>
         </div>

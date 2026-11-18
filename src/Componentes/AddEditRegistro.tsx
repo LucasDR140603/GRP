@@ -128,14 +128,13 @@ export default function({x,editar=false}:Props){
             <TextField className='textarea' multiline={true} maxRows={2} inputRef={descRef} value={descripcion} onChange={(e)=>{setDescripcion(e.target.value)}} label="Descripción"/>
             <TextField className='textarea' multiline={true} maxRows={2} inputRef={obsRef} value={observaciones} onChange={(e)=>{setObservaciones(e.target.value)}} label="Observaciones"/>
             <TextField type="datetime-local" error={error_fechas} onChange={ChangeBegin} value={formatDate(begin,'yyyy-MM-dd HH:mm')}/>
-            {x.id==null || x.fin==null?<FormControlLabel control={<Checkbox/>} label="Terminado" onChange={(e)=>{setEnd(end!=null?null:begin)}}/>:null}
-            {end!=null?<TextField style={{gridColumn:'1',gridRow:x.fin==null?5:4}} error={error_fechas} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>:null}
+            {(x.id==null || x.fin==null) && <FormControlLabel control={<Checkbox/>} label="Terminado" onChange={(e)=>{setEnd(end!=null?null:begin)}}/>}
+            {end!=null && <TextField style={{gridColumn:'1',gridRow:x.fin==null?5:4}} error={error_fechas} type="datetime-local" onChange={ChangeEnd} value={formatDate(end,'yyyy-MM-dd HH:mm')}/>}
             {campos_gasto.map((y,i)=>{
                 return <TextField style={{gridColumn:'2',gridRow:(i+1)}} label={labels_gasto[i]+": "+y} type='number' value={y} onChange={(e)=>{let v=parseFloat(e.target.value) || 0;sets_gasto[i](v<0?0:v)}}/>
             })}
         </div>
         <Button variant='outlined' onClick={enviar}>Confirmar</Button>
-        {acierto?<Alert severity='success'>Registro {editar?"editado":"añadido"} con éxito</Alert>:null}
-        {error?<Alert severity='error'>ERROR{error_fechas?": La fecha de inicio no debe ser mayor a la de fin.":""}</Alert>:null}
+        {(acierto || error) && <Alert severity={error?"error":"success"}>{acierto?`Registro ${editar?"editado":"añadido"} con éxito`:`$ERROR${error_fechas && ': La fecha de inicio no debe ser mayor a la de fin.'}`}</Alert>}
     </div>
 }

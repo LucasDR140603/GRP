@@ -321,11 +321,11 @@ export default function(){
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {ordenados().map((x)=>{
+                        {ordenados().map((x,i)=>{
                             let terminado=x.fin!=null
                             let campos_inicio=x.inicio.split(' ')
                             let campos_fin=terminado?x.fin.split(' '):'En Curso'
-                        return <Tr hover={true} sx={{cursor:'pointer'}} selected={x.id==seleccion?.id} className={terminado?'':'gold'} onClick={()=>{setSeleccion(seleccion!=null?null:x)}}><Td>{x.cliente}</Td><Td>{x.centro}</Td><Td>{x.proyecto}</Td><Td>{x.usuario}</Td><Td>{campos_inicio[0]}</Td><Td>{campos_inicio[1]}</Td>{!terminado?<Td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</Td>:<><Td>{campos_fin[0]}</Td><Td>{campos_fin[1]}</Td></>}<Td>{x.descripcion}</Td><Td>{x.observaciones}</Td><Td>{x.duracion??'En Curso'}</Td></Tr>
+                        return <Tr key={i} hover={true} sx={{cursor:'pointer'}} selected={x.id==seleccion?.id} className={terminado?'':'gold'} onClick={()=>{setSeleccion(seleccion!=null?null:x)}}><Td>{x.cliente}</Td><Td>{x.centro}</Td><Td>{x.proyecto}</Td><Td>{x.usuario}</Td><Td>{campos_inicio[0]}</Td><Td>{campos_inicio[1]}</Td>{!terminado?<Td colSpan={2} style={{textAlign:'center'}}>{campos_fin}</Td>:<><Td>{campos_fin[0]}</Td><Td>{campos_fin[1]}</Td></>}<Td>{x.descripcion}</Td><Td>{x.observaciones}</Td><Td>{x.duracion??'En Curso'}</Td></Tr>
                         })}
                     </Tbody>
                 </Table>

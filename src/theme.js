@@ -30,6 +30,13 @@ const theme=createTheme({
                 }
             }
         },
+        MuiTextField:{
+            styleOverrides:{
+                root:{
+                    backgroundColor:'#0d1014',
+                }
+            }
+        }
     }
 })
 export default theme;

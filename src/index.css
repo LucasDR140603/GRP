@@ -10,6 +10,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background: url('./FondoFuturista.svg') center / cover no-repeat;
+  pointer-events: none;
+  will-change:transform;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

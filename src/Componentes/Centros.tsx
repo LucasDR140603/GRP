@@ -137,8 +137,8 @@ export default function(){
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {ordenados().map((x)=>{
-                            return <Tr sx={{cursor:'pointer'}} hover={true} selected={x.id==seleccion?.id} className={!x.abierto?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><Td>{getClienteByCentro.current(x).nombre}</Td><Td>{x.nombre}</Td><Td>{x.abierto?"Abierto":"Cerrado"}</Td></Tr>
+                        {ordenados().map((x,i)=>{
+                            return <Tr key={i} sx={{cursor:'pointer'}} hover={true} selected={x.id==seleccion?.id} className={!x.abierto?'aqua':''} onClick={()=>{if(usuario.administrador){setSeleccion(seleccion!=null?null:x)}}}><Td>{getClienteByCentro.current(x).nombre}</Td><Td>{x.nombre}</Td><Td>{x.abierto?"Abierto":"Cerrado"}</Td></Tr>
                         })}
                     </Tbody>
                 </Table>

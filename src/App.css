@@ -22,9 +22,10 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
+  backdrop-filter:blur(15px);
   /* box-shadow: 0 0 10px 0px azure; */
 }
-header,.useroptions{
+.useroptions{
   background-color: #0D1018;
 }
 .userbox,.useroptions,.useroption{

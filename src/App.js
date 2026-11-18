@@ -24,22 +24,17 @@ import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import * as React from 'react'
 function App() {
-  const id=React.useId()
-  const buttonId=`${id}-button`
-  const menuId=`${id}-menu`
   const [anchorEl,setAnchorEl]=useState(null)
-  const open=Boolean(anchorEl)
-
   const ulr_datos_usuario='datos-usuario'
   const {deshacer_administrador,clientes,centros,proyectos,registros,usuario,usuarios,logout,cargando,prevuser}=useData()
   const enlaces=usuario==null?["Iniciar Sesión","Registrar"]:["Registros","Proyectos","Centros","Clientes"].concat(usuario.administrador?["Usuarios"]:[])
   const paginas=usuario==null?[<Login/>,<Register/>]:[<Registros/>,<Proyectos/>,<Centros/>,<Clientes/>].concat(usuario.administrador?[<Usuarios/>]:[])
   const location=useLocation().pathname.replace('/','')
-  const [options,setOptions]=useState(false)
+  const open=Boolean(anchorEl)
   return (
     <ThemeProvider theme={theme}>
       {/* <CssBaseline/> */}
-      <div className="App" onClick={()=>{setOptions(false)}}>
+      <div className="App">
         {cargando?
           <div style={{margin:'0 auto',display:'flex',alignItems:'center',flex:'1'}}><BallTriangle
             height={100}
@@ -57,34 +52,23 @@ function App() {
             <Tabs value={location} sx={{borderBottom:'1px solid rgba(255,255,255,0.25)','& .MuiTabs-indicator':{backgroundColor:'yellow'},'& .MuiTab-root':{'&.Mui-selected':{color:'yellow'}}}}>
               {enlaces.map((x,i)=><Tab label={x.toUpperCase()} value={i==0?'':url(x)} to={i==0?'':url(x)} component={Link}/>)}
             </Tabs>
-            {/* <div className='enlaces'>
-              {enlaces.map((x,i)=><Link className={location==url(x) || i==0 && location==""?'marcado':'enlace'} to={url(x)}>{x.toUpperCase()}</Link>)}
-            </div> */}
             <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
               {usuario!=null?
               <>
-              <Button aria-controls={options ? menuId : undefined} id={buttonId} aria-expanded={options} style={{display:'flex',gap:'0.5rem'}} aria-haspopup="true" onClick={(e)=>{e.stopPropagation();setOptions(!options);setAnchorEl(e.currentTarget)}}>
+              <Button style={{display:'flex',gap:'0.5rem'}} onClick={(e)=>{e.stopPropagation();setAnchorEl(e.currentTarget)}}>
                 <p>{usuario.nick}</p>
                 <Perfil usuario={usuario}/>
               </Button>
-              <Menu id={menuId} open={options} slotProps={{
-                    list: {
-                      'aria-labelledby': buttonId,
-                    },
+              <Menu open={open} slotProps={{
                     paper:{
                       sx:{
                         marginTop:'1rem',
                       }
                     }
-                  }} anchorEl={anchorEl} open={open} onClose={()=>{setAnchorEl(null)}}>
+                  }} anchorEl={anchorEl} onClose={()=>{setAnchorEl(null)}}>
                 <MenuItem onClick={(e)=>{setAnchorEl(null);}}><Link to={ulr_datos_usuario}>Datos de Usuario</Link></MenuItem>
                 <MenuItem onClick={(e)=>{setAnchorEl(null);logout()}}>Cerrar Sesión</MenuItem>
               </Menu>
-                {/* {options && 
-                <div className='desplegable useroptions' style={{top:'120%'}}>
-                  <Link to={ulr_datos_usuario}>Datos de Usuario</Link>
-                  <Link onClick={logout}>Cerrar Sesión</Link>
-                </div>} */}
               </>
               :null}
               <Link to={'/'} style={{fontSize:0}}><Button style={{padding:'0.75rem'}}><img src={logo} className='logo'/></Button></Link>

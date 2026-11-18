@@ -54,9 +54,9 @@ export default function({x,editar=false}:Props){
         <div className="column">
             {selects()}
             <TextField error={error} label="Nombre" value={nombre} onChange={(e)=>{setNombre(e.target.value)}} style={{width:'100%'}}/>
-            {x.id!=null?<FormControlLabel control={<Checkbox/>} checked={abierto} label='Abierto' onChange={(e)=>{setAbierto(!abierto)}}/>:null}
+            {x.id!=null && <FormControlLabel control={<Checkbox/>} checked={abierto} label='Abierto' onChange={(e)=>{setAbierto(!abierto)}}/>}
             <Button variant='outlined' onClick={enviar}>Confirmar</Button>
-            {acierto || error?<Alert severity={error?"error":"success"}>{acierto?`Centro ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</Alert>:null}
+            {(acierto || error) && <Alert severity={error?"error":"success"}>{acierto?`Centro ${editar?"editado":"añadido"} con éxito`:`ERROR: Nombre repetido`}</Alert>}
         </div>
     )
 }

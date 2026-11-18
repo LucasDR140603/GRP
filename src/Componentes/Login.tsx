@@ -25,8 +25,6 @@ export default function(){
     const [codigo_correcto,setCodigoCorrecto]=useState(false)
     const [cargando,setCargando]=useState(false)
     const inputRefs=useRef<any>([])
-    const [abierto,setAbierto]=useState(false)
-    // const ventana=useRef<any>(null)
     const tiempo=()=>{
         const t=new Date();
         t.setSeconds(t.getSeconds()+900);
@@ -88,14 +86,6 @@ export default function(){
         }
     },[user,clave,clave_repe,recuperar,encontrado,codigo_correcto,token,codigo])
     useEffect(()=>{
-        if (recuperar){
-            // ventana.current.showModal()
-            // setAbierto(true)
-        }
-        else{
-            // ventana.current.close()
-            // setAbierto(false)
-        }
         restart(tiempo())
         setEncontrado(false)
         setUser("")
@@ -175,19 +165,16 @@ export default function(){
                     <div className="column">
                         {!encontrado?
                         <>
-                            {/* <h1>RECUPERAR CUENTA</h1> */}
                             <TextField error={error} onChange={(e)=>{setError(false);setUser(e.target.value)}} label="Nick o Email"/>
                             <Button variant='outlined' onClick={buscar}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Buscando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Buscar Usuario"}</Button>
                         </>
                         :!codigo_correcto?
                         <>
-                            {/* <h1 style={{marginBottom:0,marginTop:'3rem',lineHeight:0}}>CÓDIGO DE RECUPERACIÓN</h1> */}
                             <h1 style={{lineHeight:0,marginBottom:'0.5rem'}}>{minutes.toString().padStart(2,'0')}:{seconds.toString().padStart(2,'0')}</h1>
                             <TextField error={error} value={codigo} type="text" onChange={(e)=>{setError(false);setCodigo(e.target.value)}} label="Código de Recuperación"/>
                             <Button variant='outlined' onClick={verificar_codigo}>{cargando?<div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>Comprobando {<ThreeDots width={"20"} height={"10"}/>}</div>:"Enviar"}</Button>
                         </>
                         :<>
-                            {/* <h1>CAMBIAR CONTRASEÑA</h1> */}
                             <Password onChange={(e)=>{setClave(e.target.value)}} error={error} label="Contraseña Nueva"/>
                             <Password onChange={(e)=>{setClaveRepe(e.target.value)}} error={error} label="Repetir Contraseña"/>
                             <Button variant='outlined' onClick={cambiar}>Enviar</Button>

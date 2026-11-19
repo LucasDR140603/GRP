@@ -41,7 +41,7 @@ export default function(){
     const loguear=()=>init({user:user,clave:clave}).then((res:any)=>{
         if (res && res.toString()=='Forbidden'){
             setError(true)
-            setMensaje('Usuario o contraseña')
+            setMensaje('Usuario o contraseña incorrectos')
         }
     })
     useEffect(()=>{
